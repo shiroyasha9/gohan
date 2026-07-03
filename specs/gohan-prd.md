@@ -1,4 +1,4 @@
-# PRD: gohan — Personal Claude Code-Driven Calorie Tracker
+# PRD: gohan, a Personal Claude Code-Driven Calorie Tracker
 
 Status: ready-for-agent
 Date: 2026-07-04
@@ -9,18 +9,18 @@ Date: 2026-07-04
 - **Wake-day convention**: entries logged before 04:00 belong to the previous date.
 - **Food cache** (`foods.json`): personal dictionary of resolved foods, per-100g nutrients + source.
 - **Measures** (`measures.json`): calibration table mapping household units (katori, roti, scoop) to grams, built up by weighing.
-- **Resolution trail**: the full record per logged item — raw input, resolved grams, basis, source, confidence.
+- **Resolution trail**: the full record per logged item: raw input, resolved grams, basis, source, confidence.
 - **Diet chart**: the dietician-provided plan; per meal slot, 2-3 allowed options. Versioned with effective-from dates.
-- **Envelope**: the daily kcal/protein range implied by resolving the diet chart's options — derived targets, never invented ones.
+- **Envelope**: the daily kcal/protein range implied by resolving the diet chart's options: derived targets, never invented ones.
 - **Adherence label**: per-meal classification `on-plan | variation | cheat`. Cheat is a label on a real slot, not a meal category. Off-chart items log under an `extra` slot.
 
 ## Problem Statement
 
-The user needs a simple, reliable calorie tracker. Existing apps fail on three fronts: they paywall essential features (photo logging, macros, export), their Indian food data is inaccurate or crowd-sourced garbage (the same roti ranging 70-150 kcal across duplicate entries), and the user's data is held hostage by third parties. The user already has a dietician, gym routine, and an ongoing body treatment — they need counting, not coaching. They eat Indian home-cooked and restaurant food that no mainstream database resolves accurately.
+The user needs a simple, reliable calorie tracker. Existing apps fail on three fronts: they paywall essential features (photo logging, macros, export), their Indian food data is inaccurate or crowd-sourced garbage (the same roti ranging 70-150 kcal across duplicate entries), and the user's data is held hostage by third parties. The user already has a dietician, gym routine, and an ongoing body treatment. They need counting, not coaching. They eat Indian home-cooked and restaurant food that no mainstream database resolves accurately.
 
 ## Solution
 
-A git-versioned repository where Claude Code is the tracking interface. The user logs meals conversationally (text, photos, or shorthand) from laptop or phone; Claude resolves nutrition against grounded Indian data sources (INDB primary, USDA/IFCT fallback), maintains a personal food cache so repeated meals resolve identically, tracks adherence against the dietician's actual diet chart, and records weight as ground truth for calibrating estimation bias. All data is plain JSON in the repo — portable, diffable, owned. Workflows are packaged as repo-level Claude Code skills; CLAUDE.md is a lean orchestrator describing the repo, formats, and conventions.
+A git-versioned repository where Claude Code is the tracking interface. The user logs meals conversationally (text, photos, or shorthand) from laptop or phone; Claude resolves nutrition against grounded Indian data sources (INDB primary, USDA/IFCT fallback), maintains a personal food cache so repeated meals resolve identically, tracks adherence against the dietician's actual diet chart, and records weight as ground truth for calibrating estimation bias. All data is plain JSON in the repo: portable, diffable, owned. Workflows are packaged as repo-level Claude Code skills; CLAUDE.md is a lean orchestrator describing the repo, formats, and conventions.
 
 ## User Stories
 
@@ -38,7 +38,7 @@ A git-versioned repository where Claude Code is the tracking interface. The user
 12. As the user, I want each logged item to keep its raw input, resolved grams, basis, source, and confidence, so that history can be recomputed when estimates improve.
 13. As the user, I want corrections to a cached food to propagate through past day-files silently, so that history stays consistent for trend analysis.
 14. As the user, I want my dietician's diet chart encoded as versioned data, so that "what I should eat" is machine-checkable.
-15. As the user, I want each meal labeled on-plan, variation, or cheat (inferred, asked only when ambiguous), so that adherence — not just calories — is tracked.
+15. As the user, I want each meal labeled on-plan, variation, or cheat (inferred, asked only when ambiguous), so that adherence (not just calories) is tracked.
 16. As the user, I want daily targets derived from the diet chart's own options, so that I'm measured against my dietician's plan, not invented numbers.
 17. As the user, I want to log "had option 2 for lunch", so that on-plan meals are near-zero effort.
 18. As the user, I want old days judged against the chart version active at the time, so that a chart revision doesn't rewrite past adherence.
@@ -119,23 +119,23 @@ A git-versioned repository where Claude Code is the tracking interface. The user
 
 ### Repository and tooling
 
-- Bun workspaces monorepo: a plain data directory at root (deliberately NOT a workspace — data outlives frameworks; its git history stays untangled from code), a core package (zod schemas doubling as validation + typed loaders), a scripts app (recompute, summaries, INDB import), a web app later (TanStack Start). Turborepo added only when the web app lands.
-- Every logging session ends with pull-rebase, commit (`log: <date> <slot>`), push — no asking.
+- Bun workspaces monorepo: a plain data directory at root (deliberately NOT a workspace: data outlives frameworks; its git history stays untangled from code), a core package (zod schemas doubling as validation + typed loaders), a scripts app (recompute, summaries, INDB import), a web app later (TanStack Start). Turborepo added only when the web app lands.
+- Every logging session ends with pull-rebase, commit (`log: <date> <slot>`), push, no asking.
 
 ### Skills architecture
 
 - CLAUDE.md is a lean orchestrator: repo map, data formats, conventions, skill routing. All workflows are repo-level skills authored via the writing-great-skills skill:
-  - `log-meal` — the daily driver: parse text/photo → resolve → confirm → write → commit.
-  - `resolve-food` — cache-miss pipeline; delegable to a subagent to keep lookup noise out of main context.
-  - `log-body` — weight, gym, treatment entries.
-  - `summarize` — daily totals, weekly rollups, adherence %, calibration check; read-only.
-  - `recompute` — propagate cache corrections; smaller-model candidate.
-  - `import-diet-chart` — chart photo → versioned chart JSON + derived envelope.
-  - `calibrate` — record weighing sessions into measures.
+  - `log-meal`, the daily driver: parse text/photo → resolve → confirm → write → commit.
+  - `resolve-food`, the cache-miss pipeline; delegable to a subagent to keep lookup noise out of main context.
+  - `log-body`: weight, gym, treatment entries.
+  - `summarize`: daily totals, weekly rollups, adherence %, calibration check; read-only.
+  - `recompute`: propagate cache corrections; smaller-model candidate.
+  - `import-diet-chart`: chart photo → versioned chart JSON + derived envelope.
+  - `calibrate`: record weighing sessions into measures.
 
 ## Testing Decisions
 
-- Single seam: the core package's public API. All deterministic logic lives there as pure functions over JSON and is tested at that boundary with `bun test` — schema validation (malformed day-files rejected loudly), wake-day date assignment, unit-to-grams resolution via measures, daily/weekly aggregation, envelope derivation from a chart, adherence matching, recompute propagation.
+- Single seam: the core package's public API. All deterministic logic lives there as pure functions over JSON and is tested at that boundary with `bun test`: schema validation (malformed day-files rejected loudly), wake-day date assignment, unit-to-grams resolution via measures, daily/weekly aggregation, envelope derivation from a chart, adherence matching, recompute propagation.
 - Good tests assert external behavior (given day-files, expect these totals), never internal structure.
 - Skills and prompts are not unit-tested; the acceptance test is a real first log producing a valid, schema-passing day-file.
 - Greenfield repo: no prior art to follow; these tests establish it.
@@ -143,7 +143,7 @@ A git-versioned repository where Claude Code is the tracking interface. The user
 ## Out of Scope
 
 - The visualization website (later phase; only the monorepo shape accommodates it now).
-- Coaching, diet advice, meal planning — the dietician's job. The system counts and reports.
+- Coaching, diet advice, meal planning: the dietician's job. The system counts and reports.
 - Calorie-burn accuracy or wearable integrations.
 - Authentication, hosting, multi-user anything.
 - Turborepo config until the web app exists.
@@ -151,9 +151,9 @@ A git-versioned repository where Claude Code is the tracking interface. The user
 
 ## Further Notes
 
-- INDB coverage of the user's staples (notably chicken tikka; the dataset skews vegetarian home cooking) must be verified during the INDB import task — first build step. If absent, those foods resolve via the IFCT-compose or flagged-LLM path.
+- INDB coverage of the user's staples (notably chicken tikka; the dataset skews vegetarian home cooking) must be verified during the INDB import task (the first build step). If absent, those foods resolve via the IFCT-compose or flagged-LLM path.
 - INDB's license is unstated ("open-access"); fine for this private personal repo, revisit before ever publishing the repo with the data embedded.
-- IFCT GitHub mirrors are AGPL-3.0 — relevant only if this repo is ever shared publicly.
+- IFCT GitHub mirrors are AGPL-3.0, relevant only if this repo is ever shared publicly.
 - Photo estimation realistically caps at ~75-90% accuracy on mixed Indian dishes (invisible oil/ghee); the always-confirm policy and text-for-invisibles habit are the mitigations, and weight-trend calibration is the backstop.
 - Diet chart photo to be provided by the user; transcription does not block any other build step.
 - User profile stats (height, weight, age) needed only at profile setup.

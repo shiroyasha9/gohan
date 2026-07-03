@@ -1,6 +1,6 @@
 {
   "name": "gohan",
-  "description": "gohan — a personal calorie tracker for Claude Code, distributed from its own repo.",
+  "description": "gohan: a personal calorie tracker for Claude Code, distributed from its own repo.",
   "owner": {
     "name": "Mubin Ansari"
   },

@@ -7,7 +7,7 @@ Write the meal into the day-file with a full resolution trail, grounded in the p
 
 ## Steps
 
-1. **Date, slot, file.** Apply the wake-day rule (profile's `wakeDayCutoffHour`) to the current time in the profile's `timezone`. Slot comes from the user's words, else from time of day. Day-file: `data/days/YYYY/MM/YYYY-MM-DD.json` — create with `{ "date": "...", "meals": [] }` if missing.
+1. **Date, slot, file.** Apply the wake-day rule (profile's `wakeDayCutoffHour`) to the current time in the profile's `timezone`. Slot comes from the user's words, else from time of day. Day-file: `data/days/YYYY/MM/YYYY-MM-DD.json`, create with `{ "date": "...", "meals": [] }` if missing.
 2. **Parse items and hit the cache.** Split the input into food items. Look each up in `data/foods.json` by name and aliases, matching context (home vs outside). Every miss → run the `resolve-food` skill before continuing. Done when every item has a `foodId`.
 3. **Resolve grams.** Weighed input → use directly (`basis: "weighed"`). Unit found in `data/measures.json` → multiply out (`basis: "measures"`). Otherwise estimate grams and state the assumption in your reply (`basis: "estimate"`).
 4. **Photo gate.** If the input included a photo: present the parsed items with portions and wait for explicit confirmation before writing anything. Text-only input logs immediately.

@@ -1,4 +1,4 @@
-# PRD: Open-Sourcing gohan (Model A — Template, then Plugin)
+# PRD: Open-Sourcing gohan (Model A: Template, then Plugin)
 
 Status: ready-for-agent
 Date: 2026-07-04
@@ -8,10 +8,10 @@ Depends on: `specs/gohan-prd.md` (the core system, built and live)
 
 Inherits `specs/gohan-prd.md` glossary. New terms:
 
-- **Template repo**: the public repository — code, skills, scripts, empty data scaffold. What strangers fork via GitHub "Use this template".
+- **Template repo**: the public repository: code, skills, scripts, empty data scaffold. What strangers fork via GitHub "Use this template".
 - **Data repo**: a user's private repository created from the template, holding their personal data. The owner's current repo becomes his data repo.
 - **Stage 1**: template + private-fork distribution. Updates flow by git merge from upstream.
-- **Stage 2**: Claude Code plugin distribution — skills/core/scripts ship as a plugin; the data repo slims to pure data. Updates flow by plugin update.
+- **Stage 2**: Claude Code plugin distribution: skills/core/scripts ship as a plugin; the data repo slims to pure data. Updates flow by plugin update.
 - **Setup skill**: onboarding skill that interviews a new user and scaffolds their data files.
 - **Food pack**: a redistributable `foods.json` collection with clean per-entry provenance (e.g. USDA-derived), shareable via community PRs.
 
@@ -21,7 +21,7 @@ The owner built gohan for himself and wants others to be able to use such a syst
 
 ## Solution
 
-Model A: every user owns their instance. Publish a clean public template repo containing the code, skills, scripts, and an empty data scaffold; each user creates a private copy that becomes their data repo. The owner's existing repo stays private and becomes his data repo. Reference datasets are generated locally by each user via the existing import script, never redistributed. Later (Stage 2), the code moves into a Claude Code plugin so user data repos become pure data and updates arrive without git merges — the owner installs his own plugin as user #1.
+Model A: every user owns their instance. Publish a clean public template repo containing the code, skills, scripts, and an empty data scaffold; each user creates a private copy that becomes their data repo. The owner's existing repo stays private and becomes his data repo. Reference datasets are generated locally by each user via the existing import script, never redistributed. Later (Stage 2), the code moves into a Claude Code plugin so user data repos become pure data and updates arrive without git merges. The owner installs his own plugin as user #1.
 
 ## User Stories
 
@@ -49,22 +49,22 @@ Model A: every user owns their instance. Publish a clean public template repo co
 ## Implementation Decisions
 
 ### Distribution model
-- Model A only: template + private per-user instances. Hosted multi-user (Supabase/Convex, auth, web UI) explicitly rejected — wrong custody model, wrong economics. If ever revisited, it builds on the core package's storage-agnostic pure logic, not by retrofitting this codebase.
-- Two stages. Stage 1 (template + fork) ships first — mostly repo surgery, zero loss. Stage 2 (plugin) is the v2 distribution once template/schema churn settles. Migration 1→2 for any user: delete code from the data repo, install plugin.
+- Model A only: template + private per-user instances. Hosted multi-user (Supabase/Convex, auth, web UI) explicitly rejected: wrong custody model, wrong economics. If ever revisited, it builds on the core package's storage-agnostic pure logic, not by retrofitting this codebase.
+- Two stages. Stage 1 (template + fork) ships first: mostly repo surgery, zero loss. Stage 2 (plugin) is the v2 distribution once template/schema churn settles. Migration 1→2 for any user: delete code from the data repo, install plugin.
 
-### Stage 1 — template extraction
+### Stage 1: template extraction
 - The public repo is a fresh extraction, not this repo flipped public: personal data already exists in this repo's history, so history cannot be shared.
 - The owner's current repo remains private and becomes his data repo, gaining an upstream remote to the template.
 - Template ships: core package, scripts, the seven skills, orchestrator CLAUDE.md, specs, empty data scaffold (structure without content).
-- Template must NOT ship: any day-files, profile, foods, measures, diet charts — and no `indb.json`: INDB's license is unstated, so the converted dataset is never redistributed. Users generate it locally via the existing import script; the script is the deliverable. Same reasoning shields IFCT (AGPL mirrors) — no IFCT-derived code or data is vendored.
-- License: code under a permissive license (MIT or Apache-2.0 — owner to pick; unresolved).
+- Template must NOT ship: any day-files, profile, foods, measures, diet charts, or `indb.json`. INDB's license is unstated, so the converted dataset is never redistributed. Users generate it locally via the existing import script; the script is the deliverable. Same reasoning shields IFCT (AGPL mirrors): no IFCT-derived code or data is vendored.
+- License: code under a permissive license (MIT or Apache-2.0, owner to pick; unresolved).
 
 ### De-personalization
 - The treatment-specific field generalizes to a treatment annotation (free-text, dated) with the same confounder semantics in summaries.
-- Timezone: currently hardcoded (summary script, profile default) — becomes a required profile field driving all date logic.
+- Timezone: currently hardcoded (summary script, profile default), becomes a required profile field driving all date logic.
 - Wake-day cutoff (04:00) becomes a profile setting with 04:00 as default.
 - Skill and doc wording neutralized where it references the owner's dietician/treatment context; the original PRD stays as a design document.
-- Diet-chart support stays fully in — it is a feature (any user with a nutritionist's plan), not a personalization.
+- Diet-chart support stays fully in: it is a feature (any user with a nutritionist's plan), not a personalization.
 
 ### Onboarding
 - New `setup` skill: conversational interview → writes profile (with timezone, cutoff), scaffolds empty data files, prompts for USDA API key (env), offers INDB import, offers diet-chart import. Follows the conversational-profile pattern from prior art.
@@ -74,19 +74,19 @@ Model A: every user owns their instance. Publish a clean public template repo co
 - CI workflow: lint (ultracite), typecheck, tests on push/PR.
 - Schema versioning: once the template has users, every schema change ships with a migration script; day-file schemas gain a version discipline. Pre-1.0 churn is why Stage 2 waits.
 
-### Stage 2 — plugin
+### Stage 2: plugin
 - Skills, core package, and scripts move into a Claude Code plugin; skills reference bundled scripts via the plugin root rather than repo paths.
 - User data repos become pure data + short CLAUDE.md + git remote.
-- Runtime prerequisite question (bun on user machines vs precompiled standalone binaries via bun's compiler) is the piece to prototype first — it gates the whole stage.
+- Runtime prerequisite question (bun on user machines vs precompiled standalone binaries via bun's compiler) is the piece to prototype first; it gates the whole stage.
 - The owner dogfoods: installs the plugin, deletes code from his data repo.
 
 ### Community surface
-- Food packs: redistributable foods collections with per-entry provenance, contributed by PR to the template (or a sibling repo). Only provenance-clean sources (USDA public domain, user-measured originals) qualify — INDB-derived entries do not.
+- Food packs: redistributable foods collections with per-entry provenance, contributed by PR to the template (or a sibling repo). Only provenance-clean sources (USDA public domain, user-measured originals) qualify; INDB-derived entries do not.
 
 ## Testing Decisions
 
 - Same single seam as the core PRD: the core package's public API, tested with bun's test runner. New/changed pure logic under test: profile-driven timezone and cutoff (wake-day with configurable cutoff already parameterized; timezone plumbing is new), treatment annotation in summaries (rename/generalize of existing tested behavior), any schema migration scripts (given old-shape day-file, expect new-shape output).
-- Template integrity gets a smoke check in CI: fresh-clone → install → validate empty scaffold → tests pass — proving the template works without any personal data present.
+- Template integrity gets a smoke check in CI: fresh-clone → install → validate empty scaffold → tests pass, proving the template works without any personal data present.
 - Setup skill and plugin packaging are not unit-tested; their acceptance test is a fresh user (or the owner's slimmed repo) completing onboarding to a first valid logged meal.
 - Prior art: the existing core test suite in this repo.
 
@@ -96,12 +96,12 @@ Model A: every user owns their instance. Publish a clean public template repo co
 - The visualization website (separate, still-planned feature from the core PRD).
 - Paying for or proxying anyone's LLM usage.
 - Marketing/launch mechanics (Show HN, etc.).
-- Stage 2 implementation details beyond the runtime-prerequisite prototype — sequenced after Stage 1 settles.
+- Stage 2 implementation details beyond the runtime-prerequisite prototype, sequenced after Stage 1 settles.
 - Migrating existing INDB-derived personal cache entries for food packs.
 
 ## Further Notes
 
-- Audience is honestly niche: requires Claude Code and terminal comfort — the plain-text-tracking crowd. That is the intended market, not a flaw.
+- Audience is honestly niche: requires Claude Code and terminal comfort, the plain-text-tracking crowd. That is the intended market, not a flaw.
 - Stage 1 estimated as roughly a day of work from current state.
 - The owner's daily logging must never break mid-migration; his repo is the reference instance throughout.
 - Unresolved: (1) license choice MIT vs Apache-2.0; (2) template repo name (`gohan` public + private data fork name); (3) whether food packs live in the template repo or a sibling community repo.

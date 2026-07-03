@@ -10,7 +10,7 @@ Fast entries into the day-file's `body` and `activity` sections. Day-files live 
 1. Wake-day date; a morning weigh-in belongs to that morning's date. Create the day-file if missing.
 2. Write the entry:
    - Weight → `body.weightKg`.
-   - Workout → append to `activity`: `{ type, durationMin, estimatedBurnKcal?, notes? }`. `estimatedBurnKcal` is display-only — never subtract it from intake anywhere.
+   - Workout → append to `activity`: `{ type, durationMin, estimatedBurnKcal?, notes? }`. `estimatedBurnKcal` is display-only: never subtract it from intake anywhere.
    - Treatment session → `body.treatment` with a short note naming it (e.g. `"lymphatic drainage, session 4"`).
 3. `bun ${CLAUDE_PLUGIN_ROOT}/scripts/validate.js <day-file>`, then the commit protocol (gohan conventions).
 
