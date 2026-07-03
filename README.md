@@ -1,68 +1,118 @@
 # gohan 🍚
 
-A calorie tracker where **Claude Code is the app** and **a git repo is the database**.
+A calorie tracker that lives in your terminal. Claude Code is the app; a private git repo you own is the database.
 
-No server, no account, no subscription, no one else holding your food history. You describe what you ate in plain language (or paste a photo); the agent resolves it against real nutrition data, writes a JSON file into your repo, and commits it. Every number is traceable to its source. Your data outlives every framework in this repo: it's just dated JSON files you can read in fifty years.
+```
+> log: 2 rotis and a katori of dal
 
-## Why this exists
+Logged to 2026-07-04 · lunch
+  roti ×2 · 80 g (your roti, calibrated) · 240 kcal
+  dal · 150 g (your katori) · 158 kcal
+Day so far: 1,240 kcal · 52 g protein · on-plan
+```
 
-Mainstream trackers paywall essentials (photo logging, data export), have terrible coverage of non-Western foods, and hold your history hostage in their cloud. gohan inverts all three:
+No server, no account, no subscription. You say what you ate (or paste a photo), the agent resolves it against real nutrition data, writes a JSON file into your repo, and commits it. In fifty years, when every app in this story is dead, your food history is still dated JSON files you can open in anything.
 
-- Your data, your repo. Each user runs their own private copy. Nothing is hosted, shared, or metered.
-- An LLM is the best food parser ever built. "2 rotis and a katori of dal" needs no forms, dropdowns, or barcode.
-- Counting, not coaching. The system records and reports. What to eat is between you and your dietician/nutritionist. gohan gives you honest numbers to bring to that conversation.
+## The problem
 
-## How it works
+Mainstream calorie trackers fail in the same three ways:
 
-- `data/days/YYYY/MM/YYYY-MM-DD.json` holds one file per day: meals, weight, workouts.
-- `data/foods.json` is your personal food cache. Each food is resolved once (nutrition database → USDA API → composed estimate, always source-flagged), then becomes canon for every repeat log.
-- `data/measures.json` records your actual utensils, weighed once ("my katori = 150 g"), so "1 katori" resolves to real grams forever.
-- `data/diet-chart/` is optional: your nutritionist's plan as versioned data, so every meal gets an adherence label and summaries compare intake against the plan's envelope.
-- Every logged item carries a resolution trail: your words verbatim, resolved food, grams and how they were derived, nutrients, source, confidence.
+1. **The essentials are paywalled.** Photo logging, macro breakdowns, and exporting your own data all sit behind a subscription.
+2. **Non-Western food data is garbage.** The same roti ranges from 70 to 150 kcal across crowd-sourced duplicate entries. If you eat dal, sabzi, or anything your grandmother would recognize, the numbers are noise.
+3. **Your history is hostage.** Years of logs live in someone else's cloud, readable only through their app, gone when they pivot or fold.
 
-Skills drive everything. You talk, the agent routes:
+And underneath all three: logging through search-a-database-and-pick-from-a-dropdown is enough friction that most people quit within weeks.
 
-| You say                                | Skill              |
-| -------------------------------------- | ------------------ |
-| "log: 2 rotis and dal" / meal photo    | `log-meal`         |
-| (new food, resolved automatically)     | `resolve-food`     |
-| "weight: 81.4" / "gym: legs, 60min"    | `log-body`         |
-| "summary" / "how was this week"        | `summarize`        |
-| "my katori weighs 150g"                | `calibrate`        |
-| share a diet plan                      | `import-diet-chart`|
-| (cache entry corrected)                | `recompute`        |
+## What gohan does instead
 
-## Setup
+- **Natural language is the interface.** "2 rotis and a katori of dal" needs no form and no barcode. An LLM is the best food parser ever built; gohan just points it at grounded data.
+- **Your data, your repo.** Each user runs their own private copy. Nothing is hosted, shared, or metered. `git log` is your audit trail.
+- **Every number is traceable.** Each logged item keeps your words verbatim, the resolved food, how the grams were derived, the nutrition source, and a confidence flag. When gohan estimates, it says so.
+- **Counting, not coaching.** gohan records and reports. What you *should* eat is between you and your dietician. gohan gives you honest numbers to bring to that conversation.
 
-Requirements: [Claude Code](https://claude.com/claude-code) and [bun](https://bun.sh).
+![How gohan works: your sentence goes through Claude Code and the gohan skills, new foods resolve through cache, INDB, USDA, and flagged estimates, grams come from your calibrated measures, and everything lands in a day-file JSON that gets committed to your private repo](assets/how-it-works.svg)
 
-1. In Claude Code, install the plugin (this repo doubles as its own marketplace):
+## Install
 
-   ```
-   /plugin marketplace add shiroyasha9/gohan
-   /plugin install gohan@gohan
-   ```
+You need [Claude Code](https://claude.com/claude-code) and [bun](https://bun.sh). The repo doubles as its own plugin marketplace:
 
-2. Make an empty directory for your food history, open Claude Code in it, and say **"set me up"**. The `setup` skill interviews you (timezone, day boundary, optional stats), scaffolds your private data repo (git init, profile, data files, a personal CLAUDE.md that's yours to edit), walks you through creating a **private** remote, and offers the optional imports:
-   - Indian food data downloads and converts the [INDB](https://www.anuvaad.org.in/) dataset (~1,000 Indian recipes) locally. It's generated on your machine, never redistributed.
-   - USDA lookups need a free [FDC API key](https://fdc.nal.usda.gov/api-key-signup.html) for everything else.
-3. Log your first meal: "log: what you just ate".
+```
+/plugin marketplace add shiroyasha9/gohan
+/plugin install gohan@gohan
+```
 
-Not eating Indian food? Skip the INDB step. USDA and composed estimates cover any cuisine.
+Then make an empty directory for your food history, open Claude Code in it, and say:
 
-Updating: `/plugin update gohan` brings the latest skills and scripts; your data repo is never touched.
+```
+set me up
+```
+
+<img src="assets/setup.png" alt="The setup skill running in Claude Code: it detects what already exists and interviews you about timezone, day cutoff, and body stats" width="800">
+
+The setup skill interviews you (timezone, day boundary, optional stats), scaffolds your private data repo, walks you through creating a **private** remote, and offers two optional imports:
+
+- **Indian food data**: downloads and converts the [INDB](https://www.anuvaad.org.in/) dataset (~1,000 Indian recipes) locally on your machine. Not eating Indian food? Skip it.
+- **USDA lookups**: a free [FDC API key](https://fdc.nal.usda.gov/api-key-signup.html) covers everything else.
+
+Updating later is `/plugin update gohan`. Your data repo is never touched.
+
+> [!IMPORTANT]
+> Your data repo is personal health data. Keep it private. Setup will never offer to create a public remote, and neither should you.
+
+## Daily use
+
+You talk; skills route:
+
+| You say                                 | What happens                                              |
+| --------------------------------------- | --------------------------------------------------------- |
+| `log: 2 rotis and dal` / a meal photo   | `log-meal` writes today's day-file, commits, shows totals |
+| `weight: 81.4` / `gym: legs, 60min`     | `log-body` records weight, workouts, treatment notes      |
+| `summary` / `how was this week`         | `summarize` shows totals, adherence %, weight trend       |
+| `my katori weighs 150g`                 | `calibrate` maps that unit to real grams, permanently     |
+| share a photo of your diet plan         | `import-diet-chart` versions it as data                   |
+| (a new food shows up)                   | `resolve-food` finds grounded numbers, caches them        |
+| (a cached food gets corrected)          | `recompute` silently fixes every affected past day        |
+
+Every write ends with a commit and push, so phone and laptop sessions never diverge.
+
+## How your data looks
+
+```
+data/
+├── days/2026/07/2026-07-04.json   one file per day: meals, weight, workouts
+├── foods.json                     personal food cache, per-100g, source-flagged
+├── measures.json                  your utensils, weighed once ("my katori = 150 g")
+├── diet-chart/                    optional: your nutritionist's plan, versioned
+└── profile.json                   timezone, day boundary, stats
+```
+
+Each food is resolved once (nutrition database first, then the USDA API, then a clearly flagged estimate) and becomes canon for every repeat log. Trends stay meaningful even when an absolute value is somewhat off, because the same dal is always the same dal.
+
+A logged item is a full resolution trail:
+
+```json
+{
+  "input": "1 katori dal",
+  "food": "dal (home)",
+  "qty": { "amount": 1, "unit": "katori", "grams": 150, "basis": "measures" },
+  "nutrients": { "kcal": 158, "protein": 9, "carbs": 21, "fat": 4, "fiber": 6 },
+  "source": "indb:DAL_TADKA",
+  "confidence": "high"
+}
+```
 
 ## Conventions worth knowing
 
-- Wake-day: entries before your configured cutoff (default 04:00) count toward the previous day. A midnight snack belongs to the day you were awake for.
-- Confidence per item: `high` (cached food + weighed/calibrated grams), `medium` (estimated grams), `low` (estimated food). Estimates are always flagged, never silent.
-- Burn is display-only: workout calories are logged for consistency tracking but never netted against intake.
+- **Wake-day**: entries before your configured cutoff (default 04:00) count toward the previous day. A midnight snack belongs to the day you were awake for.
+- **Confidence per item**: `high` means a cached food with weighed or calibrated grams, `medium` means estimated grams, `low` means an estimated food.
+- **Burn is display-only**: workout calories are tracked for consistency, but they are never netted against intake. Fictional burn numbers don't get to justify extra eating.
+- **Adherence is derived, not invented**: with a diet chart imported, every meal gets an `on-plan` / `variation` / `cheat` label, and summaries compare intake against *your nutritionist's* targets rather than numbers gohan made up.
 
 ## Development
 
-This repo is the dev workspace; `plugin/` is what ships (skills, prebuilt script bundles, schemas copy, session hook). `bun run build:plugin` regenerates the bundles from source; CI fails if they drift. Dev loop: `claude --plugin-dir ./plugin` in a scratch directory, `/reload-plugins` after edits.
+This repo is the dev workspace; `plugin/` is what ships (skills, prebuilt bun bundles, schemas copy, session hook). After changing `apps/scripts` or `packages/core`, run `bun run build:plugin` and commit the regenerated bundles. CI fails on drift.
 
-`bun test` · `bun run typecheck` · `bun run check` (biome via ultracite). Schemas in `packages/core/src/schemas.ts` are the single source of truth for every data shape. Design docs live in `specs/`.
+Dev loop: `claude --plugin-dir ./plugin` from a scratch data directory, `/reload-plugins` after edits. Quality gates: `bun test`, `bun run typecheck`, `bun run check`. `packages/core/src/schemas.ts` is the single source of truth for every data shape; design docs live in `specs/`.
 
 ## License
 

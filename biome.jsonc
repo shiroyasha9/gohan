@@ -2,8 +2,8 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "extends": ["ultracite/biome/core"],
   "files": {
-    // reference datasets and shipped plugin bundles are generated, not linted
-    "includes": ["!data/reference", "!plugin/scripts"]
+    // reference datasets, shipped plugin bundles, and readme assets are generated, not linted
+    "includes": ["!data/reference", "!plugin/scripts", "!assets"]
   },
   "overrides": [
     {
