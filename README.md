@@ -36,14 +36,25 @@ Skills drive everything — you talk, the agent routes:
 
 Requirements: [Claude Code](https://claude.com/claude-code) and [bun](https://bun.sh).
 
-1. Click **Use this template** → create a **private** repo (it will hold your food history).
-2. Clone it, run `bun install`.
-3. Open Claude Code in the repo and say **"set me up"** — the `setup` skill interviews you (timezone, day boundary, optional stats), scaffolds your data files, and offers the optional imports:
-   - **Indian food data**: `bun run import-indb` downloads and converts the [INDB](https://www.anuvaad.org.in/) dataset (~1,000 Indian recipes) locally. It is generated on your machine, never redistributed.
+1. In Claude Code, install the plugin (this repo doubles as its own marketplace):
+
+   ```
+   /plugin marketplace add shiroyasha9/gohan
+   /plugin install gohan@gohan
+   ```
+
+2. Make an empty directory for your food history, open Claude Code in it, and say **"set me up"** — the `setup` skill interviews you (timezone, day boundary, optional stats), scaffolds your private data repo (git init, profile, data files, a personal CLAUDE.md that's yours to edit), walks you through creating a **private** remote, and offers the optional imports:
+   - **Indian food data**: downloads and converts the [INDB](https://www.anuvaad.org.in/) dataset (~1,000 Indian recipes) locally. It is generated on your machine, never redistributed.
    - **USDA lookups**: a free [FDC API key](https://fdc.nal.usda.gov/api-key-signup.html) for everything else.
-4. Log your first meal: "log: what you just ate".
+3. Log your first meal: "log: what you just ate".
 
 Not eating Indian food? Skip the INDB step — USDA and composed estimates cover any cuisine.
+
+Updating: `/plugin update gohan` brings the latest skills and scripts; your data repo is never touched.
+
+### Migrating from the template (pre-plugin) layout
+
+If your data repo came from the old use-this-template flow: install the plugin as above, then in your data repo delete everything except `data/` and `.gitignore` — that means removing `packages/`, `apps/`, `specs/`, config files, **and `.claude/skills/` (mandatory: repo-level skills silently shadow the plugin's skills)** — and drop the `upstream` remote (updates now arrive via `/plugin update`, not git merge). Your day-files keep working unchanged.
 
 ## Conventions worth knowing
 
@@ -53,7 +64,9 @@ Not eating Indian food? Skip the INDB step — USDA and composed estimates cover
 
 ## Development
 
-`bun test` · `bun run typecheck` · `bun run check` (biome via ultracite) · `bun run validate` (schema-check all data files). Schemas in `packages/core/src/schemas.ts` are the single source of truth for every data shape. Design docs live in `specs/`.
+This repo is the dev workspace; `plugin/` is what ships (skills, prebuilt script bundles, schemas copy, session hook). `bun run build:plugin` regenerates the bundles from source; CI fails if they drift. Dev loop: `claude --plugin-dir ./plugin` in a scratch directory, `/reload-plugins` after edits.
+
+`bun test` · `bun run typecheck` · `bun run check` (biome via ultracite). Schemas in `packages/core/src/schemas.ts` are the single source of truth for every data shape. Design docs live in `specs/`.
 
 ## License
 

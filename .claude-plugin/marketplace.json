@@ -1,0 +1,14 @@
+{
+  "name": "gohan",
+  "description": "gohan — a personal calorie tracker for Claude Code, distributed from its own repo.",
+  "owner": {
+    "name": "Mubin Ansari"
+  },
+  "plugins": [
+    {
+      "name": "gohan",
+      "source": "./plugin",
+      "description": "Personal calorie tracker. Claude Code is the interface; plain JSON in git is the database."
+    }
+  ]
+}
