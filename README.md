@@ -1,6 +1,11 @@
-# gohan 🍚
+<p align="center">
+  <img src="assets/gohan.jpg" alt="gohan: counting, not coaching. A bowl of rice next to a handwritten calorie log" width="440">
+</p>
 
-A calorie tracker that lives in your terminal. Claude Code is the app; a private git repo you own is the database.
+<p align="center">
+  A calorie tracker that lives in your terminal.<br>
+  <b>Claude Code is the app; a private git repo you own is the database.</b>
+</p>
 
 ```
 > log: 2 rotis and a katori of dal
