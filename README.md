@@ -52,10 +52,6 @@ Not eating Indian food? Skip the INDB step — USDA and composed estimates cover
 
 Updating: `/plugin update gohan` brings the latest skills and scripts; your data repo is never touched.
 
-### Migrating from the template (pre-plugin) layout
-
-If your data repo came from the old use-this-template flow: install the plugin as above, then in your data repo delete everything except `data/` and `.gitignore` — that means removing `packages/`, `apps/`, `specs/`, config files, **and `.claude/skills/` (mandatory: repo-level skills silently shadow the plugin's skills)** — and drop the `upstream` remote (updates now arrive via `/plugin update`, not git merge). Your day-files keep working unchanged.
-
 ## Conventions worth knowing
 
 - **Wake-day**: entries before your configured cutoff (default 04:00) count toward the previous day — a midnight snack belongs to the day you were awake for.
