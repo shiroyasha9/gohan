@@ -1,0 +1,24 @@
+{
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.2",
+    "@types/bun": "^1.3.0",
+    "typescript": "^6.0.3",
+    "ultracite": "7.8.4"
+  },
+  "name": "gohan",
+  "scripts": {
+    "test": "bun test",
+    "validate": "bun apps/scripts/src/validate.ts",
+    "summary": "bun apps/scripts/src/summary.ts",
+    "recompute": "bun apps/scripts/src/recompute.ts",
+    "import-indb": "bun apps/scripts/src/import-indb.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "check": "ultracite check",
+    "fix": "ultracite fix"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "private": true
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@gohan/scripts",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@gohan/core": "workspace:*",
+    "xlsx": "^0.18.5"
+  }
+}
