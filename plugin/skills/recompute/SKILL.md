@@ -7,8 +7,8 @@ History follows the cache: day-files silently re-derive from corrected entries s
 
 ## Steps
 
-1. `bun run recompute [from] [to]` (no args = all days). It rewrites only items whose `foodId` matches a changed entry.
-2. Review the printed change list; `bun run validate` must pass.
+1. `bun ${CLAUDE_PLUGIN_ROOT}/scripts/recompute.js [from] [to]` (no args = all days). It rewrites only items whose `foodId` matches a changed entry.
+2. Review the printed change list; `bun ${CLAUDE_PLUGIN_ROOT}/scripts/validate.js` must pass.
 3. Commit protocol, message `recompute: <food> correction`.
 
 Done when validate passes and the commit is pushed.

@@ -12,8 +12,9 @@ Personal calorie tracker. Claude Code is the interface; plain JSON in git is the
 - `data/reference/` — committed datasets (INDB etc.), read-only.
 - `packages/core` — zod schemas + pure logic. `packages/core/src/schemas.ts` is the authoritative shape of every data file.
 - `apps/scripts` — CLIs: `bun run validate | summary | recompute`.
+- `plugin/` — the shipped plugin surface: skills, bundled scripts (`bun run build:plugin` regenerates), schemas copy, session hook. Dev-load with `claude --plugin-dir ./plugin`.
 
-## Skills
+## Skills (in `plugin/skills/`)
 
 | When                                       | Skill               |
 | ------------------------------------------ | ------------------- |

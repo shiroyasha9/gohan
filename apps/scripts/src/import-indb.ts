@@ -1,7 +1,5 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { readFile as readWorkbook, utils, type WorkBook } from "xlsx";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { read, utils, type WorkBook } from "xlsx";
 
 const INDB_URL =
   "https://www.anuvaad.org.in/wp-content/uploads/2020/07/Anuvaad_INDB_2024.11.xlsx";
@@ -93,15 +91,14 @@ function nutrients(row: Row, prefix: string) {
 async function loadWorkbook(): Promise<WorkBook> {
   const localPath = process.argv[2];
   if (localPath) {
-    return readWorkbook(localPath);
+    return read(new Uint8Array(await readFile(localPath)), { type: "array" });
   }
   const response = await fetch(INDB_URL);
   if (!response.ok) {
     throw new Error(`INDB download failed: ${response.status} ${INDB_URL}`);
   }
-  const xlsxPath = join(tmpdir(), "Anuvaad_INDB.xlsx");
-  await writeFile(xlsxPath, new Uint8Array(await response.arrayBuffer()));
-  return readWorkbook(xlsxPath);
+  // buffer parse instead of xlsx's readFile — its fs shim is absent in bundles
+  return read(new Uint8Array(await response.arrayBuffer()), { type: "array" });
 }
 
 const workbook = await loadWorkbook();

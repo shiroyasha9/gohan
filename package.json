@@ -12,6 +12,7 @@
     "summary": "bun apps/scripts/src/summary.ts",
     "recompute": "bun apps/scripts/src/recompute.ts",
     "import-indb": "bun apps/scripts/src/import-indb.ts",
+    "build:plugin": "bun build apps/scripts/src/validate.ts apps/scripts/src/summary.ts apps/scripts/src/recompute.ts apps/scripts/src/import-indb.ts --target=bun --outdir plugin/scripts && cp packages/core/src/schemas.ts plugin/schemas.ts",
     "typecheck": "tsc -p tsconfig.json",
     "check": "ultracite check",
     "fix": "ultracite fix"

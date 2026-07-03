@@ -7,7 +7,7 @@ Read-only: no writes, no commit.
 
 ## Steps
 
-1. `bun run summary --from <date> --to <date>` (defaults to the last 7 days).
+1. `bun ${CLAUDE_PLUGIN_ROOT}/scripts/summary.js --from <date> --to <date>` (defaults to the last 7 days).
 2. Present, in plain prose:
    - Daily kcal/protein averages vs the chart envelope (when present; name unresolved options).
    - Adherence: on-plan %, cheat count, and _where_ cheats cluster (days, slots).

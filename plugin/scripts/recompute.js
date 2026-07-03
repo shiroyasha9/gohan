@@ -14,10 +14,8 @@ var __export = (target, all) => {
     });
 };
 
-// apps/scripts/src/validate.ts
-import { existsSync } from "fs";
-import { readFile as readFile2 } from "fs/promises";
-import { basename } from "path";
+// apps/scripts/src/recompute.ts
+import { writeFile } from "fs/promises";
 
 // packages/core/src/aggregate.ts
 var EMPTY_TOTALS = {
@@ -14630,51 +14628,24 @@ function round12(n) {
 function nutrientsEqual(a, b) {
   return a.kcal === b.kcal && a.protein === b.protein && a.carbs === b.carbs && a.fat === b.fat && a.fiber === b.fiber;
 }
-// apps/scripts/src/validate.ts
+// apps/scripts/src/recompute.ts
 var {Glob } = globalThis.Bun;
-function schemaFor(path) {
-  if (path.includes("data/days/")) {
-    return dayFileSchema;
+var [from = "0000-00-00", to = "9999-99-99"] = process.argv.slice(2);
+var foods = await loadFoods("data");
+var paths = [...new Glob("data/days/**/*.json").scanSync(".")].filter((p) => {
+  const date5 = p.split("/").pop()?.replace(".json", "") ?? "";
+  return date5 >= from && date5 <= to;
+});
+var changedFiles = 0;
+for (const path of paths.sort()) {
+  const day = await loadDayFile(path);
+  const result = recomputeDay(day, foods.foods);
+  if (!result.changed) {
+    continue;
   }
-  if (path.includes("data/diet-chart/")) {
-    return dietChartSchema;
-  }
-  const name = basename(path);
-  if (name === "foods.json") {
-    return foodsFileSchema;
-  }
-  if (name === "measures.json") {
-    return measuresFileSchema;
-  }
-  if (name === "profile.json") {
-    return profileSchema;
-  }
-  return null;
+  await writeFile(path, `${JSON.stringify(result.day, null, 2)}
+`);
+  changedFiles += 1;
+  console.log(`${path}: ${result.changedItems.join(", ")}`);
 }
-async function validate(path) {
-  const schema = schemaFor(path);
-  if (!schema) {
-    return `${path}: no schema mapped to this path`;
-  }
-  const raw = JSON.parse(await readFile2(path, "utf8"));
-  const result = schema.safeParse(raw);
-  if (result.success) {
-    return null;
-  }
-  return `${path}:
-${result.error.issues.map((i) => `  ${i.path.join(".") || "(root)"}: ${i.message}`).join(`
-`)}`;
-}
-var args = process.argv.slice(2);
-var paths = args.length ? args : [
-  ...new Glob("data/days/**/*.json").scanSync("."),
-  ...new Glob("data/diet-chart/*.json").scanSync("."),
-  ...["data/foods.json", "data/measures.json", "data/profile.json"].filter((p) => existsSync(p))
-];
-var failures = (await Promise.all(paths.map(validate))).filter((f) => f !== null);
-if (failures.length) {
-  console.error(failures.join(`
-`));
-  process.exit(1);
-}
-console.log(`${paths.length} file(s) valid`);
+console.log(`${paths.length} day(s) checked, ${changedFiles} updated`);

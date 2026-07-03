@@ -14,11 +14,6 @@ var __export = (target, all) => {
     });
 };
 
-// apps/scripts/src/validate.ts
-import { existsSync } from "fs";
-import { readFile as readFile2 } from "fs/promises";
-import { basename } from "path";
-
 // packages/core/src/aggregate.ts
 var EMPTY_TOTALS = {
   kcal: 0,
@@ -14630,51 +14625,30 @@ function round12(n) {
 function nutrientsEqual(a, b) {
   return a.kcal === b.kcal && a.protein === b.protein && a.carbs === b.carbs && a.fat === b.fat && a.fiber === b.fiber;
 }
-// apps/scripts/src/validate.ts
-var {Glob } = globalThis.Bun;
-function schemaFor(path) {
-  if (path.includes("data/days/")) {
-    return dayFileSchema;
-  }
-  if (path.includes("data/diet-chart/")) {
-    return dietChartSchema;
-  }
-  const name = basename(path);
-  if (name === "foods.json") {
-    return foodsFileSchema;
-  }
-  if (name === "measures.json") {
-    return measuresFileSchema;
-  }
-  if (name === "profile.json") {
-    return profileSchema;
-  }
-  return null;
+// apps/scripts/src/summary.ts
+function isoToday(timeZone) {
+  return new Date().toLocaleDateString("en-CA", { timeZone });
 }
-async function validate(path) {
-  const schema = schemaFor(path);
-  if (!schema) {
-    return `${path}: no schema mapped to this path`;
-  }
-  const raw = JSON.parse(await readFile2(path, "utf8"));
-  const result = schema.safeParse(raw);
-  if (result.success) {
-    return null;
-  }
-  return `${path}:
-${result.error.issues.map((i) => `  ${i.path.join(".") || "(root)"}: ${i.message}`).join(`
-`)}`;
+function shiftDays(date5, delta) {
+  const d = new Date(`${date5}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + delta);
+  return d.toISOString().slice(0, 10);
 }
-var args = process.argv.slice(2);
-var paths = args.length ? args : [
-  ...new Glob("data/days/**/*.json").scanSync("."),
-  ...new Glob("data/diet-chart/*.json").scanSync("."),
-  ...["data/foods.json", "data/measures.json", "data/profile.json"].filter((p) => existsSync(p))
-];
-var failures = (await Promise.all(paths.map(validate))).filter((f) => f !== null);
-if (failures.length) {
-  console.error(failures.join(`
-`));
-  process.exit(1);
+var args = new Map;
+for (let i = 2;i < process.argv.length; i += 2) {
+  const flag = process.argv[i];
+  if (!flag) {
+    break;
+  }
+  args.set(flag.replace(/^--/, ""), process.argv[i + 1] ?? "");
 }
-console.log(`${paths.length} file(s) valid`);
+var profile = await loadProfile("data");
+var to = args.get("to") ?? isoToday(profile.timezone);
+var from = args.get("from") ?? shiftDays(to, -6);
+var days = await loadDaysInRange("data", from, to);
+var summary = summarize(days);
+var foods = await loadFoods("data").catch(() => ({ foods: [] }));
+var charts = await loadDietCharts("data");
+var chart2 = chartForDate(charts, to);
+var envelope = chart2 ? deriveEnvelope(chart2, foods.foods) : null;
+console.log(JSON.stringify({ from, to, summary, envelope }, null, 2));
