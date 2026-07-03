@@ -15,4 +15,12 @@ jobs:
       - run: bun run check
       - run: bun run typecheck
       - run: bun test
-      - run: bun run validate
+      - name: Bundle freshness
+        run: |
+          bun run build:plugin
+          git diff --exit-code plugin/scripts plugin/schemas.ts
+      - name: Plugin + marketplace manifests
+        run: |
+          bun install -g @anthropic-ai/claude-code
+          claude plugin validate .
+          claude plugin validate ./plugin
