@@ -148,6 +148,14 @@ describe("profileSchema", () => {
     const parsed = profileSchema.parse({ timezone: "Asia/Kolkata" });
     expect(parsed.wakeDayCutoffHour).toBe(4);
   });
+
+  test("accepts a custom gender string", () => {
+    const parsed = profileSchema.parse({
+      timezone: "Asia/Kolkata",
+      gender: "non-binary",
+    });
+    expect(parsed.gender).toBe("non-binary");
+  });
 });
 
 describe("dayFileRelativePath", () => {

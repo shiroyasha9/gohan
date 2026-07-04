@@ -98,6 +98,7 @@ export const profileSchema = z.strictObject({
   heightCm: z.number().positive().optional(),
   startingWeightKg: z.number().positive().optional(),
   birthYear: z.number().int().optional(),
+  gender: z.string().min(1).optional(),
   timezone: z.string().min(1),
   wakeDayCutoffHour: z.number().int().min(0).max(23).default(4),
   notes: z.string().optional(),

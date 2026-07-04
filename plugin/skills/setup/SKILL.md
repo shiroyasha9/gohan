@@ -10,7 +10,7 @@ Conversational onboarding: interview, then scaffold a data repo in the current d
 1. **Interview.** Ask, in one message:
    - Timezone (IANA name; suggest a guess from the system clock).
    - When their eating day rolls over (`wakeDayCutoffHour`; default 04:00, meaning a midnight snack counts toward the previous day).
-   - Optional, may skip freely: height cm, current weight kg, birth year.
+   - Optional, may skip freely: height cm, current weight kg, birth year, gender (male / female / other; if other, they name it).
 2. **Scaffold the data repo** in the current directory:
    - `git init` if not already a git repository.
    - `data/profile.json` from the answers (current weight → `startingWeightKg`).

@@ -14523,6 +14523,7 @@ var profileSchema = exports_external.strictObject({
   heightCm: exports_external.number().positive().optional(),
   startingWeightKg: exports_external.number().positive().optional(),
   birthYear: exports_external.number().int().optional(),
+  gender: exports_external.string().min(1).optional(),
   timezone: exports_external.string().min(1),
   wakeDayCutoffHour: exports_external.number().int().min(0).max(23).default(4),
   notes: exports_external.string().optional()

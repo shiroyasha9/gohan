@@ -156,4 +156,4 @@ A git-versioned repository where Claude Code is the tracking interface. The user
 - IFCT GitHub mirrors are AGPL-3.0, relevant only if this repo is ever shared publicly.
 - Photo estimation realistically caps at ~75-90% accuracy on mixed Indian dishes (invisible oil/ghee); the always-confirm policy and text-for-invisibles habit are the mitigations, and weight-trend calibration is the backstop.
 - Diet chart photo to be provided by the user; transcription does not block any other build step.
-- User profile stats (height, weight, age) needed only at profile setup.
+- User profile stats (height, weight, age, gender) needed only at profile setup.
