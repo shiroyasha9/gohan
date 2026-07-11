@@ -42,3 +42,14 @@ Conversational onboarding: interview, then scaffold a data repo in the current d
 6. **Point forward:** tell them the first real test is logging a meal: "log: <what you just ate>".
 
 Done when profile + scaffolds validate, the commit exists, and the user knows the `log:` shorthand.
+
+## Remote mode (claude.ai)
+
+No shell and no local files — only a GitHub connector? Interview as in step 1, then:
+
+- **Create the repo** with the connector: name `gohan-data`, **private** — never public, this is health data. If you cannot guarantee it comes out private, stop and have the user create a private repo on github.com first.
+- **Scaffold in one commit** (push-files tool, message `chore: scaffold gohan data repo`): `data/profile.json`, `data/foods.json` (`{ "foods": [] }`), `data/measures.json` (`{ "measures": [] }`), `.gitignore` (`.env`, `.DS_Store`), and the thin `CLAUDE.md` from step 2 verbatim. JSON style everywhere: 2-space indent, trailing newline.
+- **Profile invariants**: `timezone` (IANA name) required; `wakeDayCutoffHour` integer 0-23; optional `heightCm`, `startingWeightKg`, `birthYear`, `gender`. When unsure, read `plugin/schemas.ts` from the public `shiroyasha9/gohan` repo via the same connector.
+- **Skip the imports**: INDB and the USDA key are desktop-only (they need local scripts and `.env`). A later desktop session in a clone of this repo can add them.
+- Remember the repo for the rest of the chat; a user-stated repo always wins.
+- Point forward the same way: logging the first meal.

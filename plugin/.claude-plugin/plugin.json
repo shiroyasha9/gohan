@@ -1,6 +1,6 @@
 {
   "name": "gohan",
-  "description": "Personal calorie tracker. Claude Code is the interface; plain JSON in git is the database.",
+  "description": "Personal calorie tracker. Claude Code or claude.ai is the interface; plain JSON in git is the database.",
   "author": {
     "name": "Mubin Ansari"
   }

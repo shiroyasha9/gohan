@@ -14,7 +14,17 @@ Ground every food in real data before it enters `data/foods.json`. A cached food
    - Compose from raw ingredients (`data/reference/` tables plus the user's recipe; ask for main ingredients and oil/ghee amount).
    - LLM estimate, last resort: derive from ingredients, cross-check magnitude against the closest INDB/USDA neighbor, record the neighbor in `notes`, `source: "llm-estimate"`.
 3. **Set `servingG`** when a natural serving exists (the user's katori, one piece, one glass).
-4. **Append the entry**: id, name, context, per100g (core five always; micros when the source has them), servingG, aliases (include the user's exact phrasing), source (`indb:<id>`, `usda:<fdcId>`, `composed`, `llm-estimate`), resolvedAt (today), notes for every assumption. `bun ${CLAUDE_PLUGIN_ROOT}/scripts/validate.js data/foods.json` must pass.
+4. **Append the entry**: id, name, context, per100g (core five always; micros when the source has them), servingG, aliases (include the user's exact phrasing), source (`indb:<id>`, `usda:<fdcId>`, `composed`, `llm-estimate`), resolvedAt (today), notes for every assumption. `bun ${CLAUDE_PLUGIN_ROOT}/scripts/validate.js data/foods.json` must pass (desktop; remote: invariants below).
 5. **If this corrected an existing entry** → run the `recompute` skill.
 
 Done when the entry validates with provenance recorded and all core-five values present.
+
+## Remote mode (claude.ai)
+
+No shell and no local files — only a GitHub connector? Work through it:
+
+- **Repo**: `gohan-data` by convention; find it once via connector repo search; a user-stated repo always wins; remember it for the rest of the chat.
+- **The lookup ladder replaces INDB/USDA** (no local reference files, no API access): search the web for grounded per-100g values. Prefer primary sources — a USDA FoodData Central page → `source: "usda:<fdcId>"`; INDB/anuvaad data → `source: "indb:<id>"`; any other credible source → `source: "web:<url>"` with the page named in `notes` and `confidence` at most `medium`. Last resort stays the cross-checked LLM estimate (`source: "llm-estimate"`, confidence low).
+- **Append with sha**: read `data/foods.json`, keep its `sha`, append the entry, write the full file back (2-space indent, trailing newline) on `main`, message `food: <name>`. On a sha conflict: re-read, re-merge, retry once.
+- **Entry invariants** as in step 4: id slug with context, per100g core five always, `servingG` when natural, `aliases`, `source`, `resolvedAt`, `notes` for every assumption. When unsure, read `plugin/schemas.ts` from the public `shiroyasha9/gohan` repo via the same connector.
+- Never invent numbers silently: every value traces to a `source`; estimates are flagged.

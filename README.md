@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  A calorie tracker that lives in your terminal.<br>
-  <b>Claude Code is the app; a private git repo you own is the database.</b>
+  A calorie tracker that lives in your terminal — and in your pocket.<br>
+  <b>Claude Code (or claude.ai on your phone) is the app; a private git repo you own is the database.</b>
 </p>
 
 ```
@@ -63,6 +63,22 @@ Updating later is `/plugin update gohan`. Your data repo is never touched.
 
 > [!IMPORTANT]
 > Your data repo is personal health data. Keep it private. Setup will never offer to create a public remote, and neither should you.
+
+## Use it from your phone (claude.ai)
+
+The same tracker works in the Claude app with no server and no extra install — the plugin provides the skills, and GitHub's own MCP server gives Claude read/write access to your data repo:
+
+1. **Install the plugin**: claude.ai → Settings → Plugins → Add → Add marketplace → *Add from a repository* → `shiroyasha9/gohan` → Install.
+2. **Create a GitHub OAuth App** (one-time, 2 minutes; GitHub doesn't support automatic client registration, so each user brings their own): GitHub → Settings → Developer settings → OAuth Apps → New. Homepage `https://claude.ai`, authorization callback `https://claude.ai/api/mcp/auth_callback`. Register, then generate a client secret.
+3. **Add the connector**: claude.ai → Settings → Connectors → Add custom connector → URL `https://api.githubcopilot.com/mcp/x/repos`, paste your OAuth App's client ID and secret → Connect → authorize on GitHub.
+4. **Name your data repo `gohan-data`** so skills find it on their own — or just tell the chat which repo it is, once per conversation. No repo yet? Say "set me up" and setup scaffolds one.
+5. **Verify** in a fresh chat on the mobile app: `log: 1 banana` → a `log:` commit should land on your repo's main branch.
+
+Caveats (as of 2026-07-11):
+
+- **Use the mobile app for now.** claude.ai *web* has an open bug ([anthropics/claude-ai-mcp#476](https://github.com/anthropics/claude-ai-mcp/issues/476)) where custom connector tools never reach the model; the phone app works.
+- **Scope**: a GitHub OAuth App grant covers every repo your account can push to, not just `gohan-data`. If that bothers you, a dedicated GitHub account owning only the data repo narrows it completely.
+- **Desktop stays the fully-tooled surface**: on the phone, new foods resolve via web search with cited sources instead of the local INDB/USDA pipeline, and long summaries or bulk recomputes will point you back to a desktop session.
 
 ## Daily use
 

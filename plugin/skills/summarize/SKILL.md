@@ -16,3 +16,12 @@ Read-only: no writes, no commit.
 3. **Calibration check**: if ≥2 weeks of data show intake-implied balance disagreeing with the actual weight trend, say so. It means the food estimates carry a systematic bias worth correcting via `resolve-food`.
 
 Done when the user has the numbers and any calibration warning.
+
+## Remote mode (claude.ai)
+
+No shell and no local files — only a GitHub connector? Still read-only:
+
+- **Repo**: `gohan-data` by convention; find it once via connector repo search; a user-stated repo always wins; remember it for the rest of the chat.
+- **No summary script here**: list `data/days/YYYY/MM/` for the range, read only the day-files that exist, and aggregate manually. Cap at 14 days; for longer ranges do the most recent 14 and point the user to a desktop session.
+- **Envelope** from the active chart (latest `effectiveFrom` on or before the range end), summed as in import-diet-chart's remote mode.
+- Present as in step 2; the calibration check still applies.

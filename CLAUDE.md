@@ -1,6 +1,6 @@
 # gohan
 
-Personal calorie tracker shipped as a Claude Code plugin. Claude Code is the interface; plain JSON in each user's private data repo is the database. The system counts and reports. Coaching is the dietician's job. Design: `specs/gohan-prd.md` · plugin packaging: `specs/plugin-prd.md`.
+Personal calorie tracker shipped as a Claude Code plugin. Claude Code or claude.ai is the interface; plain JSON in each user's private data repo is the database. The system counts and reports. Coaching is the dietician's job. Design: `specs/gohan-prd.md` · plugin packaging: `specs/plugin-prd.md` · claude.ai surface: `specs/remote-mode.md`.
 
 This repo is the dev workspace and its own plugin marketplace. User data never lives here.
 
@@ -14,7 +14,8 @@ This repo is the dev workspace and its own plugin marketplace. User data never l
 ## Working on the plugin
 
 - After changing `apps/scripts` or `packages/core`: `bun run build:plugin` and commit the regenerated bundles. CI fails on drift.
-- User-facing conventions (wake-day, confidence, source discipline, commit protocol, shorthand) live in `plugin/hooks/session-start.sh`; the data-file map lives there and in skill bodies. Edit those, not this file, to change user behavior.
+- User-facing conventions (wake-day, confidence, source discipline, commit protocol, shorthand) live in `plugin/hooks/session-start.sh`; the data-file map lives there and in skill bodies. Edit those, not this file, to change user behavior. The hook never runs on claude.ai, so each skill mirrors the conventions it uses in its "Remote mode" section per `specs/remote-mode.md` — edit both together.
+- Skill `description:` frontmatter must never contain angle brackets: the claude.ai plugin importer silently drops such skills.
 - Dev loop: `claude --plugin-dir ./plugin` from a scratch data repo (`data/profile.json` present triggers the hook); `/reload-plugins` after edits; `claude plugin validate .` checks both manifests.
 - Versioning: commit-SHA mode until 1.0, no version fields, every push to main is installable.
 

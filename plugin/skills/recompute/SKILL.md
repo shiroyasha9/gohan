@@ -12,3 +12,12 @@ History follows the cache: day-files silently re-derive from corrected entries s
 3. Commit protocol, message `recompute: <food> correction`.
 
 Done when validate passes and the commit is pushed.
+
+## Remote mode (claude.ai)
+
+No shell and no local files — only a GitHub connector? Small corrections only:
+
+- **Repo**: `gohan-data` by convention; find it once via connector repo search; a user-stated repo always wins; remember it for the rest of the chat.
+- Read the corrected `data/foods.json` entry, list the affected day-files, and re-derive `nutrients` = per-100g × `qty.grams` for matching `foodId` items only. `qty`, `input`, and `source` never change.
+- **Cap ~31 day-files**; anything larger belongs on desktop, where `recompute.js` does it in one command.
+- Commit every rewritten file in one batch (push-files tool) on `main`, message `recompute: <food> correction`.
