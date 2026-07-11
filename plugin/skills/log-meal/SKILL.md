@@ -1,6 +1,6 @@
 ---
 name: log-meal
-description: Log food into today's day-file. Use when the user describes something they ate ("log:", "I had", "just ate"), pastes a meal photo, or says "had option N of <slot>".
+description: Log food into today's day-file. Use when the user describes something they ate ("log:", "I had", "just ate"), pastes a meal photo, or says "had option 2 of lunch"-style shorthand.
 ---
 
 Write the meal into the day-file with a full resolution trail, grounded in the personal food cache. Authoritative shapes: `${CLAUDE_PLUGIN_ROOT}/schemas.ts`. Conventions (wake-day, confidence, commit protocol) arrive via the gohan session hook.
