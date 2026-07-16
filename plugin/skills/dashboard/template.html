@@ -254,28 +254,49 @@ section h2 {
   letter-spacing: -0.01em;
 }
 section .key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
   margin: 5px 0 16px;
   font-size: 12.5px;
   color: var(--muted);
 }
+section .key .ki {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
 section .key .swatch {
-  display: inline-block;
   width: 10px;
   height: 10px;
-  margin: 0 4px -1px 0;
   border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--border);
 }
 section .key .dot {
-  display: inline-block;
   width: 7px;
   height: 7px;
-  margin: 0 4px 0 0;
   border-radius: 50%;
 }
 section .key .glyph {
-  margin-right: 3px;
   font-size: 9px;
   color: var(--ink-2);
+}
+section .key .dashline {
+  width: 16px;
+  border-top: 2px dashed var(--ink-2);
+}
+section .key .wsk {
+  width: 2px;
+  height: 11px;
+  background: var(--ink-2);
+  border-radius: 1px;
+  opacity: 0.6;
+}
+section .key .linemark {
+  width: 16px;
+  height: 2px;
+  background: var(--kcal);
+  border-radius: 1px;
 }
 section svg {
   display: block;
@@ -524,12 +545,12 @@ footer a:focus-visible {
     <p class="key" id="kcalKey"></p>
     <div id="kcalChart"></div>
   </section>
-  <section id="weightCard">
+  <section class="span" id="weightCard">
     <h2>Weight</h2>
     <p class="key" id="weightKey"></p>
     <div id="weightChart"></div>
   </section>
-  <section id="proteinCard">
+  <section class="span" id="proteinCard">
     <h2>Protein</h2>
     <p class="key" id="proteinKey"></p>
     <div id="proteinChart"></div>
@@ -674,23 +695,26 @@ function roundedTopBar(x, y, w, h, r) {
 }
 
 function keyEntry(parent, markClass, markColor, text) {
+  const item = document.createElement("span");
+  item.className = "ki";
   const mark = document.createElement("span");
   mark.className = markClass;
   if (markColor) {
     mark.style.background = markColor;
   }
-  parent.appendChild(mark);
-  parent.appendChild(document.createTextNode(text));
+  item.appendChild(mark);
+  item.appendChild(document.createTextNode(text));
+  parent.appendChild(item);
 }
 function keyGlyph(parent, glyph, text) {
+  const item = document.createElement("span");
+  item.className = "ki";
   const mark = document.createElement("span");
   mark.className = "glyph";
   mark.textContent = glyph;
-  parent.appendChild(mark);
-  parent.appendChild(document.createTextNode(text));
-}
-function keySep(parent) {
-  parent.appendChild(document.createTextNode("  ·  "));
+  item.appendChild(mark);
+  item.appendChild(document.createTextNode(text));
+  parent.appendChild(item);
 }
 
 function uncertaintyKcal(day) {
@@ -921,13 +945,16 @@ function drawBandLabel(svg, geo, refLines, bandKind) {
   }
   const yMid = geo.y((seg[bandKind].min + seg[bandKind].max) / 2);
   const collides = refLines.some(
-    (r) => r.value !== null && Math.abs(geo.y(r.value) - yMid) < 14
+    (r) => r.value !== null && Math.abs(geo.y(r.value) - yMid) < 30
   );
   if (collides) {
     return;
   }
-  const lbl = el("text", { x: geo.M.left + geo.plotW + 5, y: yMid + 3 }, svg);
+  const x = geo.M.left + geo.plotW + 6;
+  const lbl = el("text", { x, y: yMid, class: "refline-label" }, svg);
   lbl.textContent = "plan";
+  const sub = el("text", { x, y: yMid + 13 }, svg);
+  sub.textContent = `${fmtInt(seg[bandKind].min)}–${fmtInt(seg[bandKind].max)}`;
 }
 
 function drawDateLabels(svg, geo, days, centered) {
@@ -1007,16 +1034,17 @@ function drawRefLines(svg, geo, refLines) {
       },
       svg
     );
+    const x = geo.M.left + geo.plotW + 6;
     const lbl = el(
       "text",
-      {
-        x: geo.M.left + geo.plotW + 5,
-        y: geo.y(ref.value) + 3,
-        class: "refline-label",
-      },
+      { x, y: geo.y(ref.value) + 3, class: "refline-label" },
       svg
     );
     lbl.textContent = ref.label;
+    if (ref.sub) {
+      const sub = el("text", { x, y: geo.y(ref.value) + 16 }, svg);
+      sub.textContent = ref.sub;
+    }
   }
 }
 
@@ -1045,7 +1073,7 @@ function barChart(config) {
     return;
   }
   const W = chartWidth(mount);
-  const M = { top: 14, right: 58, bottom: workoutRow ? 34 : 24, left: 42 };
+  const M = { top: 26, right: 74, bottom: workoutRow ? 34 : 24, left: 46 };
   const plotW = W - M.left - M.right;
   const bandVals = DATA.envelopes.flatMap((s) =>
     bandKind ? [s[bandKind].max] : []
@@ -1055,7 +1083,7 @@ function barChart(config) {
     ...bandVals,
     ...refLines.map((r) => r.value || 0)
   );
-  const ticks = niceTicks(maxVal * 1.06, 4);
+  const ticks = niceTicks(maxVal * 1.06, 6);
   const yMax = Math.max(ticks.at(-1), maxVal * 1.06);
   const plotH = config.plotH;
   const H = plotH + M.top + M.bottom;
@@ -1070,6 +1098,12 @@ function barChart(config) {
   };
 
   drawGridAndTicks(svg, geo, ticks);
+  const unitLbl = el(
+    "text",
+    { x: M.left - 6, y: 12, "text-anchor": "end" },
+    svg
+  );
+  unitLbl.textContent = config.axisUnit;
   if (bandKind) {
     drawEnvelopeBand(svg, geo, days, bandKind, config.washVar, config.barVar);
   }
@@ -1087,7 +1121,7 @@ function barChart(config) {
       {
         d: roundedTopBar(bx, geo.y(v), barW, geo.y(0) - geo.y(v), 3),
         class: "bar",
-        fill: config.barVar,
+        fill: config.fillOf ? config.fillOf(d) : config.barVar,
         tabindex: 0,
         role: "img",
         "aria-label": `${shortDate(d.date)}: ${fmtInt(v)} ${config.unit}`,
@@ -1112,26 +1146,21 @@ function barChart(config) {
 
 function initKcalKey() {
   const key = document.getElementById("kcalKey");
-  const parts = [];
+  keyEntry(key, "dot", "var(--kcal)", "daily intake");
   if (DATA.envelopes.length > 0) {
-    parts.push(() =>
-      keyEntry(key, "swatch", "var(--kcal-wash)", "plan envelope")
-    );
+    keyEntry(key, "swatch", "var(--kcal-wash)", "plan range");
   }
   if (DATA.derived.tdee !== null) {
-    parts.push(() => keyEntry(key, "", null, "dashed = est. burn"));
+    keyEntry(key, "dashline", null, "est. daily burn");
+  }
+  if (DATA.days.some((d) => d.logged && d.cheats > 0)) {
+    keyEntry(key, "dot", "var(--cheat)", "cheat day");
   }
   if (DATA.days.some((d) => d.workoutMin > 0)) {
-    parts.push(() => keyGlyph(key, "▲", "workout day"));
+    keyGlyph(key, "▲", "workout");
   }
   if (DATA.days.some((d) => d.logged && uncertaintyKcal(d) > 1)) {
-    parts.push(() => keyEntry(key, "", null, "whisker = estimate uncertainty"));
-  }
-  for (const [i, add] of parts.entries()) {
-    if (i > 0) {
-      keySep(key);
-    }
-    add();
+    keyEntry(key, "wsk", null, "estimate uncertainty");
   }
 }
 
@@ -1141,15 +1170,23 @@ function renderKcalChart() {
     keyId: "kcalKey",
     days: DATA.days,
     unit: "kcal",
-    plotH: 230,
+    axisUnit: "kcal",
+    plotH: 260,
     barVar: "var(--kcal)",
     washVar: "var(--kcal-wash)",
+    fillOf: (d) => (d.cheats > 0 ? "var(--cheat)" : "var(--kcal)"),
     emptyText: "No meals logged in this window yet.",
     valueOf: (d) => d.totals.kcal,
     bandKind: "kcal",
     whiskers: true,
     workoutRow: true,
-    refLines: [{ value: DATA.derived.tdee, label: "est. burn" }],
+    refLines: [
+      {
+        value: DATA.derived.tdee,
+        label: "est. burn",
+        sub: DATA.derived.tdee === null ? "" : `${fmtInt(DATA.derived.tdee)}`,
+      },
+    ],
     tooltipRows: (d) => {
       const rows = [
         [shortDate(d.date), ""],
@@ -1170,20 +1207,12 @@ function renderKcalChart() {
 
 function initProteinKey() {
   const key = document.getElementById("proteinKey");
-  const hasBand = DATA.envelopes.length > 0;
-  if (hasBand) {
-    keyEntry(key, "swatch", "var(--protein-wash)", "plan protein band");
+  keyEntry(key, "dot", "var(--protein)", "daily protein");
+  if (DATA.envelopes.length > 0) {
+    keyEntry(key, "swatch", "var(--protein-wash)", "plan range");
   }
   if (referenceKg()) {
-    if (hasBand) {
-      keySep(key);
-    }
-    keyEntry(
-      key,
-      "",
-      null,
-      `dashed = ${PROTEIN_PER_KG_REF} g/kg research mark`
-    );
+    keyEntry(key, "dashline", null, `${PROTEIN_PER_KG_REF} g/kg research mark`);
   }
 }
 
@@ -1194,7 +1223,8 @@ function renderProteinChart() {
     keyId: "proteinKey",
     days: DATA.days,
     unit: "g protein",
-    plotH: 180,
+    axisUnit: "g",
+    plotH: 210,
     barVar: "var(--protein)",
     washVar: "var(--protein-wash)",
     emptyText: "No meals logged in this window yet.",
@@ -1207,6 +1237,7 @@ function renderProteinChart() {
         ? {
             value: Math.round(refKg * PROTEIN_PER_KG_REF),
             label: `${PROTEIN_PER_KG_REF} g/kg`,
+            sub: `${fmtInt(refKg * PROTEIN_PER_KG_REF)} g`,
           }
         : { value: null, label: "" },
     ],
@@ -1232,20 +1263,18 @@ function initWeightKey() {
     return;
   }
   keyEntry(key, "dot", "var(--muted)", "weigh-in");
-  keySep(key);
-  keyEntry(key, "dot", "var(--kcal)", "smoothed trend");
+  keyEntry(key, "linemark", null, "smoothed trend");
   const treatments = DATA.days.filter((d) => d.treatment !== null);
   if (treatments.length > 0) {
-    keySep(key);
     keyEntry(key, "swatch", "var(--treatment-wash)", "treatment day");
   }
 }
 
 function weightScales(mount, weighIns, trend) {
   const W = chartWidth(mount);
-  const M = { top: 14, right: 58, bottom: 24, left: 44 };
+  const M = { top: 26, right: 74, bottom: 24, left: 46 };
   const plotW = W - M.left - M.right;
-  const plotH = 200;
+  const plotH = 230;
   const kgs = weighIns.map((d) => d.weightKg).concat(trend.map((t) => t.kg));
   const lo = Math.floor(Math.min(...kgs) * 2) / 2 - 0.5;
   const hi = Math.ceil(Math.max(...kgs) * 2) / 2 + 0.5;
@@ -1264,6 +1293,12 @@ function weightScales(mount, weighIns, trend) {
 }
 
 function drawWeightAxes(svg, s) {
+  const unitLbl = el(
+    "text",
+    { x: s.M.left - 6, y: 12, "text-anchor": "end" },
+    svg
+  );
+  unitLbl.textContent = "kg";
   const step = (s.hi - s.lo) / 4;
   for (let t = 0; t <= 4; t++) {
     const kg = s.lo + t * step;
@@ -1523,7 +1558,6 @@ function renderHeatmap() {
   const key = document.getElementById("heatKey");
   keyEntry(key, "swatch", "var(--heat-2)", "darker = more meals");
   if (DATA.days.some((d) => d.cheats > 0)) {
-    keySep(key);
     keyEntry(key, "dot", "var(--cheat)", "cheat meal");
   }
   const root = document.getElementById("heatmap");
