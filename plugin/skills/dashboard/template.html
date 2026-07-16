@@ -1,26 +1,30 @@
 <title>gohan dashboard</title>
 <style>
 :root {
-  --page: #f7f8f9;
-  --surface: #ffffff;
-  --ink: #14161a;
-  --ink-2: #454a51;
-  --muted: #7d828b;
-  --grid: #e7e9ec;
-  --axis: #cfd2d7;
-  --border: rgba(20, 22, 26, 0.1);
+  --page: #faefe0;
+  --surface: #fff8ee;
+  --ink: #241c14;
+  --ink-2: #57493c;
+  --muted: #8a7a68;
+  --grid: #eddfcb;
+  --axis: #d6c5ab;
+  --border: rgba(36, 28, 20, 0.12);
+  --brand: #ee7a5c;
+  --brand-deep: #d8603f;
+  --rice: #fffaf0;
+  --mint: #3e8f6d;
   --kcal: #2a78d6;
-  --kcal-wash: rgba(42, 120, 214, 0.09);
+  --kcal-wash: rgba(42, 120, 214, 0.13);
   --protein: #1baf7a;
-  --protein-wash: rgba(27, 175, 122, 0.08);
+  --protein-wash: rgba(27, 175, 122, 0.11);
   --cheat: #eb6834;
-  --treatment-wash: rgba(125, 130, 139, 0.15);
-  --heat-1: #8ab8f0;
-  --heat-2: #5598e7;
-  --heat-3: #256abf;
+  --treatment-wash: rgba(138, 122, 104, 0.16);
+  --heat-1: #75a8e8;
+  --heat-2: #4c92e4;
+  --heat-3: #2166ba;
   --heat-4: #104281;
-  --tooltip-bg: #14161a;
-  --tooltip-ink: #ffffff;
+  --tooltip-bg: #241c14;
+  --tooltip-ink: #fff8ee;
   --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-round:
     ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", system-ui,
@@ -29,50 +33,58 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
-    --page: #0e1013;
-    --surface: #16191d;
-    --ink: #f4f5f6;
-    --ink-2: #b6bac1;
-    --muted: #81868f;
-    --grid: #24272c;
-    --axis: #34383e;
-    --border: rgba(244, 245, 246, 0.1);
+    --page: #181210;
+    --surface: #221a15;
+    --ink: #f7f1ea;
+    --ink-2: #cbbcac;
+    --muted: #98897a;
+    --grid: #2e241d;
+    --axis: #41342a;
+    --border: rgba(247, 241, 234, 0.12);
+    --brand: #f2917a;
+    --brand-deep: #d8603f;
+    --rice: #f5ecdd;
+    --mint: #7cc5a1;
     --kcal: #3987e5;
     --kcal-wash: rgba(57, 135, 229, 0.14);
     --protein: #199e70;
     --protein-wash: rgba(25, 158, 112, 0.1);
     --cheat: #d95926;
-    --treatment-wash: rgba(129, 134, 143, 0.16);
+    --treatment-wash: rgba(152, 137, 122, 0.16);
     --heat-1: #1c5cab;
     --heat-2: #2a78d6;
     --heat-3: #5598e7;
     --heat-4: #9ec5f4;
-    --tooltip-bg: #f4f5f6;
-    --tooltip-ink: #14161a;
+    --tooltip-bg: #f7f1ea;
+    --tooltip-ink: #241c14;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --page: #0e1013;
-  --surface: #16191d;
-  --ink: #f4f5f6;
-  --ink-2: #b6bac1;
-  --muted: #81868f;
-  --grid: #24272c;
-  --axis: #34383e;
-  --border: rgba(244, 245, 246, 0.1);
+  --page: #181210;
+  --surface: #221a15;
+  --ink: #f7f1ea;
+  --ink-2: #cbbcac;
+  --muted: #98897a;
+  --grid: #2e241d;
+  --axis: #41342a;
+  --border: rgba(247, 241, 234, 0.12);
+  --brand: #f2917a;
+  --brand-deep: #d8603f;
+  --rice: #f5ecdd;
+  --mint: #7cc5a1;
   --kcal: #3987e5;
   --kcal-wash: rgba(57, 135, 229, 0.14);
   --protein: #199e70;
   --protein-wash: rgba(25, 158, 112, 0.1);
   --cheat: #d95926;
-  --treatment-wash: rgba(129, 134, 143, 0.16);
+  --treatment-wash: rgba(152, 137, 122, 0.16);
   --heat-1: #1c5cab;
   --heat-2: #2a78d6;
   --heat-3: #5598e7;
   --heat-4: #9ec5f4;
-  --tooltip-bg: #f4f5f6;
-  --tooltip-ink: #14161a;
+  --tooltip-bg: #f7f1ea;
+  --tooltip-ink: #241c14;
   color-scheme: dark;
 }
 
@@ -105,30 +117,78 @@ body {
 header.top {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 16px;
-  align-items: baseline;
+  gap: 12px 16px;
+  align-items: center;
   justify-content: space-between;
-  padding-bottom: 4px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
+}
+a.brand {
+  color: var(--brand);
+  text-decoration: none;
+}
+a.brand:hover {
+  opacity: 0.82;
+}
+a.brand:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 4px;
+  opacity: 0.82;
 }
 header.top h1 {
   margin: 0;
   font-family: var(--font-round);
-  font-size: 23px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
-header.top h1 .jp {
-  margin-left: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  letter-spacing: 0.02em;
+header.top h1 .bowl {
+  display: inline-block;
+  width: 0.74em;
+  height: 0.74em;
+  margin: 0 0.03em;
+  vertical-align: -0.05em;
+}
+header.top .tagline {
+  display: block;
+  margin-top: 1px;
+  font-family: var(--font-round);
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--mint);
+  letter-spacing: 0.01em;
+}
+header.top .meta {
+  display: flex;
+  gap: 14px;
+  align-items: center;
 }
 header.top .window {
-  font-size: 13px;
+  font-size: 15px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   color: var(--ink-2);
+}
+.themebtn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ink-2);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+}
+.themebtn:hover {
+  background: var(--border);
+}
+.themebtn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
 .stats {
@@ -364,7 +424,7 @@ td {
   height: 5px;
   content: "";
   background: var(--cheat);
-  border: 1px solid var(--surface);
+  border: 1px solid var(--page);
   border-radius: 50%;
 }
 .cell:focus-visible {
@@ -403,15 +463,60 @@ td {
 }
 
 footer {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--muted);
+}
+footer a {
+  font-weight: 650;
+  color: var(--brand);
+  text-decoration: none;
+}
+footer a:hover,
+footer a:focus-visible {
+  text-decoration: underline;
 }
 </style>
 
 <div class="wrap">
   <header class="top span">
-    <h1>gohan <span class="jp">ご飯</span></h1>
-    <span class="window" id="windowLabel"></span>
+    <a
+      aria-label="gohan on GitHub"
+      class="brand"
+      href="https://github.com/shiroyasha9/gohan"
+      rel="noreferrer"
+      target="_blank"
+    >
+      <h1>
+        g<svg aria-hidden="true" class="bowl" viewBox="0 0 100 100">
+          <ellipse cx="50" cy="40" fill="var(--rice)" rx="31" ry="16" />
+          <circle cx="33" cy="33" fill="var(--rice)" r="10" />
+          <circle cx="50" cy="28" fill="var(--rice)" r="11" />
+          <circle cx="67" cy="33" fill="var(--rice)" r="10" />
+          <path
+            d="M13,47 L87,47 C87,68 72,83 50,83 C28,83 13,68 13,47 Z"
+            fill="var(--brand)"
+          />
+          <rect
+            fill="var(--brand-deep)"
+            height="8"
+            rx="3"
+            width="26"
+            x="37"
+            y="82"
+          />
+        </svg>han
+        <span class="tagline">counting, not coaching</span>
+      </h1>
+    </a>
+    <span class="meta">
+      <span class="window" id="windowLabel"></span>
+      <button
+        aria-label="Switch between light and dark theme"
+        class="themebtn"
+        id="themeBtn"
+        type="button"
+      ></button>
+    </span>
   </header>
   <div class="stats span" id="stats"></div>
   <section class="span" id="kcalCard">
@@ -620,8 +725,60 @@ function renderWindowLabel() {
   const generated = DATA.generatedAt
     ? shortDate(DATA.generatedAt)
     : shortDate(DATA.to);
-  document.getElementById("footer").textContent =
-    `Generated ${generated} · gohan counts and reports; coaching stays with your dietician.`;
+  const footer = document.getElementById("footer");
+  footer.append(`Generated ${generated} by `);
+  const repo = document.createElement("a");
+  repo.href = "https://github.com/shiroyasha9/gohan";
+  repo.target = "_blank";
+  repo.rel = "noreferrer";
+  repo.textContent = "gohan";
+  footer.append(
+    repo,
+    " · it counts and reports; coaching stays with your dietician."
+  );
+}
+
+function currentTheme() {
+  const set = document.documentElement.dataset.theme;
+  if (set === "dark" || set === "light") {
+    return set;
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function initThemeToggle() {
+  const btn = document.getElementById("themeBtn");
+  const syncIcon = () => {
+    btn.textContent = currentTheme() === "dark" ? "☀" : "☾";
+  };
+  try {
+    const stored = localStorage.getItem("gohan-theme");
+    if (stored === "dark" || stored === "light") {
+      document.documentElement.dataset.theme = stored;
+    }
+  } catch {
+    // sandboxed pages may deny storage; theme still toggles for the session
+  }
+  btn.addEventListener("click", () => {
+    const next = currentTheme() === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("gohan-theme", next);
+    } catch {
+      // ignore denied storage
+    }
+    syncIcon();
+  });
+  new MutationObserver(syncIcon).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", syncIcon);
+  syncIcon();
 }
 
 function stat(parent, label, valueText, unit, sub) {
@@ -1455,6 +1612,7 @@ function renderCharts() {
   renderProteinChart();
 }
 
+initThemeToggle();
 renderWindowLabel();
 renderStats();
 initKcalKey();
