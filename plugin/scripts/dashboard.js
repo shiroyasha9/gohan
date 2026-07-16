@@ -14938,7 +14938,7 @@ function round12(n) {
 function nutrientsEqual(a, b) {
   return a.kcal === b.kcal && a.protein === b.protein && a.carbs === b.carbs && a.fat === b.fat && a.fiber === b.fiber;
 }
-// apps/scripts/src/summary.ts
+// apps/scripts/src/dashboard.ts
 function isoToday(timeZone) {
   return new Date().toLocaleDateString("en-CA", { timeZone });
 }
@@ -14957,11 +14957,12 @@ for (let i = 2;i < process.argv.length; i += 2) {
 }
 var profile = await loadProfile("data");
 var to = args.get("to") ?? isoToday(profile.timezone);
-var from = args.get("from") ?? shiftDays(to, -6);
+var from = args.get("from") ?? shiftDays(to, -29);
 var days = await loadDaysInRange("data", from, to);
-var summary = summarize(days);
 var foods = await loadFoods("data").catch(() => ({ foods: [] }));
 var charts = await loadDietCharts("data");
-var chart2 = chartForDate(charts, to);
-var envelope = chart2 ? deriveEnvelope(chart2, foods.foods) : null;
-console.log(JSON.stringify({ from, to, summary, envelope }, null, 2));
+var data = buildDashboardData(days, charts, foods.foods, profile, {
+  from,
+  to
+});
+console.log(JSON.stringify({ ...data, generatedAt: isoToday(profile.timezone) }, null, 2));

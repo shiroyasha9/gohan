@@ -1,5 +1,6 @@
 export * from "./aggregate.ts";
 export * from "./chart.ts";
+export * from "./dashboard.ts";
 export * from "./loaders.ts";
 export * from "./measures.ts";
 export * from "./recompute.ts";

@@ -1,0 +1,1288 @@
+<title>gohan dashboard</title>
+<style>
+:root {
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.1);
+  --series: #2a78d6;
+  --series-wash: rgba(42, 120, 214, 0.1);
+  --workout: #1baf7a;
+  --cheat: #eb6834;
+  --treatment-wash: rgba(137, 135, 129, 0.14);
+  --heat-1: #9ec5f4;
+  --heat-2: #5598e7;
+  --heat-3: #256abf;
+  --heat-4: #104281;
+  --tooltip-bg: #0b0b0b;
+  --tooltip-ink: #ffffff;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, 0.1);
+    --series: #3987e5;
+    --series-wash: rgba(57, 135, 229, 0.14);
+    --workout: #199e70;
+    --cheat: #d95926;
+    --treatment-wash: rgba(137, 135, 129, 0.16);
+    --heat-1: #1c5cab;
+    --heat-2: #2a78d6;
+    --heat-3: #5598e7;
+    --heat-4: #9ec5f4;
+    --tooltip-bg: #fcfcfb;
+    --tooltip-ink: #0b0b0b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --ink: #ffffff;
+  --ink-2: #c3c2b7;
+  --muted: #898781;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --border: rgba(255, 255, 255, 0.1);
+  --series: #3987e5;
+  --series-wash: rgba(57, 135, 229, 0.14);
+  --workout: #199e70;
+  --cheat: #d95926;
+  --treatment-wash: rgba(137, 135, 129, 0.16);
+  --heat-1: #1c5cab;
+  --heat-2: #2a78d6;
+  --heat-3: #5598e7;
+  --heat-4: #9ec5f4;
+  --tooltip-bg: #fcfcfb;
+  --tooltip-ink: #0b0b0b;
+  color-scheme: dark;
+}
+
+body {
+  padding: 20px 16px 48px;
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--page);
+}
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+header.top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 4px 2px 8px;
+}
+header.top h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+}
+header.top .window {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.tile .label {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.tile .value {
+  font-size: 27px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.tile .value .unit {
+  margin-left: 2px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.tile .sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.card {
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.card h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+}
+.card .key {
+  margin: 2px 0 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.card .key .swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin: 0 3px -1px 0;
+  background: var(--series-wash);
+  border-radius: 2px;
+}
+.card .key .dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 3px 0 0;
+  border-radius: 50%;
+}
+.card svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.scrollbox {
+  overflow-x: auto;
+}
+.empty {
+  padding: 18px 0;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+svg text {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  fill: var(--muted);
+}
+svg .refline-label {
+  fill: var(--ink-2);
+}
+.bar {
+  fill: var(--series);
+}
+.bar:hover,
+.bar:focus-visible {
+  outline: none;
+  filter: brightness(1.15);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bar {
+    transition: filter 120ms ease;
+  }
+}
+
+.insights {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  margin: 6px 0 0;
+  list-style: none;
+}
+.insights li {
+  display: flex;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.insights li::before {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  content: "";
+  background: var(--series);
+  border-radius: 1px;
+}
+
+details.tableview {
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+details.tableview summary {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+details.tableview summary:focus-visible {
+  outline: 2px solid var(--series);
+  outline-offset: 2px;
+}
+table {
+  width: 100%;
+  min-width: 560px;
+  margin-top: 10px;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  border-collapse: collapse;
+}
+th {
+  font-weight: 600;
+  color: var(--muted);
+  text-align: right;
+}
+th:first-child {
+  text-align: left;
+}
+td {
+  color: var(--ink-2);
+  text-align: right;
+}
+td:first-child {
+  color: var(--ink);
+  text-align: left;
+}
+th,
+td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--grid);
+}
+
+.heatwrap {
+  display: flex;
+  gap: 8px;
+}
+.heat-daylabels {
+  display: grid;
+  flex: none;
+  grid-template-rows: repeat(7, 16px);
+  gap: 3px;
+}
+.heat-daylabels span {
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--muted);
+}
+.heatgrid {
+  display: grid;
+  grid-template-rows: repeat(7, 16px);
+  grid-auto-columns: 16px;
+  grid-auto-flow: column;
+  gap: 3px;
+}
+.cell {
+  position: relative;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--grid);
+}
+.cell.logged {
+  box-shadow: none;
+}
+.cell.blank {
+  box-shadow: none;
+}
+.cell.cheat::after {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 5px;
+  height: 5px;
+  content: "";
+  background: var(--cheat);
+  border: 1px solid var(--surface);
+  border-radius: 50%;
+}
+.cell:focus-visible {
+  outline: 2px solid var(--series);
+  outline-offset: 1px;
+}
+.streakline {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  visibility: hidden;
+  max-width: 240px;
+  padding: 7px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--tooltip-ink);
+  pointer-events: none;
+  background: var(--tooltip-bg);
+  border-radius: 6px;
+}
+#tooltip .tv {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+#tooltip .tl {
+  opacity: 0.75;
+}
+
+footer {
+  padding: 6px 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>gohan dashboard</h1>
+    <span class="window" id="windowLabel"></span>
+  </header>
+  <div class="tiles" id="tiles"></div>
+  <section class="card" id="kcalCard">
+    <h2>Calories</h2>
+    <p class="key" id="kcalKey"></p>
+    <div id="kcalChart"></div>
+  </section>
+  <section class="card" id="weightCard">
+    <h2>Weight</h2>
+    <p class="key" id="weightKey"></p>
+    <div id="weightChart"></div>
+  </section>
+  <section class="card" id="proteinCard">
+    <h2>Protein</h2>
+    <p class="key" id="proteinKey"></p>
+    <div id="proteinChart"></div>
+  </section>
+  <section class="card" id="heatCard">
+    <h2>Logging</h2>
+    <p class="key" id="heatKey"></p>
+    <div class="scrollbox">
+      <div class="heatwrap" id="heatmap"></div>
+    </div>
+    <p class="streakline" id="streakline"></p>
+  </section>
+  <section class="card" id="insightsCard">
+    <h2>What the data shows</h2>
+    <ul class="insights" id="insights"></ul>
+  </section>
+  <details class="tableview">
+    <summary>Data table</summary>
+    <div class="scrollbox" id="tablebox"></div>
+  </details>
+  <footer id="footer"></footer>
+</div>
+<div id="tooltip" role="status"></div>
+
+<script>
+"use strict";
+// biome-ignore lint/correctness/noUndeclaredVariables: injection token replaced at publish time
+const DATA = __GOHAN_DATA__;
+// biome-ignore lint/correctness/noUndeclaredVariables: injection token replaced at publish time
+const INSIGHTS = __GOHAN_INSIGHTS__;
+
+const UNCERTAINTY = { high: 0.05, medium: 0.15, low: 0.3 };
+const PROTEIN_PER_KG_REF = 1.6;
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+const SVGNS = "http://www.w3.org/2000/svg";
+
+const fmtInt = (n) => Math.round(n).toLocaleString("en-US");
+const fmt1 = (n) => (Math.round(n * 10) / 10).toLocaleString("en-US");
+const parseDate = (iso) => new Date(`${iso}T00:00:00Z`);
+const shortDate = (iso) => {
+  const d = parseDate(iso);
+  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`;
+};
+const weekdayIndexMon = (iso) => (parseDate(iso).getUTCDay() + 6) % 7;
+
+function el(tag, attrs, parent) {
+  const node = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    node.setAttribute(k, v);
+  }
+  if (parent) {
+    parent.appendChild(node);
+  }
+  return node;
+}
+function html(tag, className, parent) {
+  const node = document.createElement(tag);
+  if (className) {
+    node.className = className;
+  }
+  if (parent) {
+    parent.appendChild(node);
+  }
+  return node;
+}
+
+const tooltip = document.getElementById("tooltip");
+function showTooltip(rows, clientX, clientY) {
+  tooltip.replaceChildren();
+  for (const [label, value] of rows) {
+    const line = document.createElement("div");
+    const v = document.createElement("span");
+    v.className = "tv";
+    v.textContent = value;
+    const l = document.createElement("span");
+    l.className = "tl";
+    l.textContent = label ? ` ${label}` : "";
+    line.append(v, l);
+    tooltip.appendChild(line);
+  }
+  tooltip.style.visibility = "visible";
+  const pad = 12;
+  const rect = tooltip.getBoundingClientRect();
+  let x = clientX + pad;
+  let y = clientY - rect.height - pad;
+  if (x + rect.width > window.innerWidth - 8) {
+    x = clientX - rect.width - pad;
+  }
+  if (y < 8) {
+    y = clientY + pad;
+  }
+  tooltip.style.left = `${x}px`;
+  tooltip.style.top = `${y}px`;
+}
+function hideTooltip() {
+  tooltip.style.visibility = "hidden";
+}
+function bindTooltip(node, rowsFn) {
+  node.addEventListener("pointermove", (e) =>
+    showTooltip(rowsFn(), e.clientX, e.clientY)
+  );
+  node.addEventListener("pointerleave", hideTooltip);
+  node.addEventListener("focus", () => {
+    const r = node.getBoundingClientRect();
+    showTooltip(rowsFn(), r.left + r.width / 2, r.top);
+  });
+  node.addEventListener("blur", hideTooltip);
+}
+
+function niceTicks(max, count) {
+  const rough = max / count;
+  const mag = 10 ** Math.floor(Math.log10(rough));
+  const step =
+    [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => max / s <= count) ||
+    10 * mag;
+  const ticks = [];
+  for (let v = 0; v <= max + 1e-9; v += step) {
+    ticks.push(v);
+  }
+  return ticks;
+}
+
+function roundedTopBar(x, y, w, h, r) {
+  if (h <= 0 || w <= 0) {
+    return "";
+  }
+  const rr = Math.min(r, w / 2, h);
+  return (
+    "M" +
+    x +
+    "," +
+    (y + h) +
+    "V" +
+    (y + rr) +
+    "Q" +
+    x +
+    "," +
+    y +
+    " " +
+    (x + rr) +
+    "," +
+    y +
+    "H" +
+    (x + w - rr) +
+    "Q" +
+    (x + w) +
+    "," +
+    y +
+    " " +
+    (x + w) +
+    "," +
+    (y + rr) +
+    "V" +
+    (y + h) +
+    "Z"
+  );
+}
+
+function keyEntry(parent, markClass, markColor, text) {
+  const mark = document.createElement("span");
+  mark.className = markClass;
+  if (markColor) {
+    mark.style.background = markColor;
+  }
+  parent.appendChild(mark);
+  parent.appendChild(document.createTextNode(text));
+}
+function keySep(parent) {
+  parent.appendChild(document.createTextNode("  ·  "));
+}
+
+function uncertaintyKcal(day) {
+  const c = day.kcalByConfidence;
+  return (
+    c.high * UNCERTAINTY.high +
+    c.medium * UNCERTAINTY.medium +
+    c.low * UNCERTAINTY.low
+  );
+}
+
+function referenceKg() {
+  const trend = DATA.derived.weightTrend;
+  if (trend.length > 0) {
+    return trend.at(-1).kg;
+  }
+  if (DATA.profile.latestWeightKg !== null) {
+    return DATA.profile.latestWeightKg;
+  }
+  return DATA.profile.startingWeightKg;
+}
+
+function envelopeAt(date, kind) {
+  const seg = DATA.envelopes.find((s) => s.from <= date && date <= s.to);
+  return seg ? seg[kind] : null;
+}
+
+function renderWindowLabel() {
+  document.getElementById("windowLabel").textContent =
+    shortDate(DATA.from) +
+    " – " +
+    shortDate(DATA.to) +
+    " · " +
+    DATA.days.length +
+    " days";
+  document.getElementById("footer").textContent =
+    "Generated " +
+    (DATA.generatedAt ? shortDate(DATA.generatedAt) : shortDate(DATA.to)) +
+    " · gohan counts and reports; coaching stays with your dietician.";
+}
+
+function tile(parent, label, valueText, unit, sub) {
+  const t = html("div", "tile", parent);
+  html("span", "label", t).textContent = label;
+  const v = html("span", "value", t);
+  v.textContent = valueText;
+  if (unit) {
+    const u = document.createElement("span");
+    u.className = "unit";
+    u.textContent = unit;
+    v.appendChild(u);
+  }
+  if (sub) {
+    html("span", "sub", t).textContent = sub;
+  }
+}
+
+function renderTiles() {
+  const root = document.getElementById("tiles");
+  const d = DATA.derived;
+  const trend = d.weightTrend;
+  const lastTrend = trend.length ? trend.at(-1).kg : null;
+  let trendSub = "no weigh-ins yet";
+  if (d.changeRateKgPerWeek !== null) {
+    const sign = d.changeRateKgPerWeek > 0 ? "+" : "";
+    trendSub = `${sign}${fmt1(d.changeRateKgPerWeek)} kg/week`;
+  } else if (lastTrend !== null) {
+    trendSub = "one weigh-in so far";
+  }
+  tile(
+    root,
+    "Trend weight",
+    lastTrend === null ? "—" : fmt1(lastTrend),
+    lastTrend === null ? "" : "kg",
+    trendSub
+  );
+  tile(
+    root,
+    "Est. expenditure",
+    d.tdee === null ? "—" : fmtInt(d.tdee),
+    d.tdee === null ? "" : "kcal",
+    d.tdee === null
+      ? "needs 14 paired days of intake + weight"
+      : "from intake + weight trend"
+  );
+  const envMid = (() => {
+    const seg = DATA.envelopes.at(-1);
+    return seg ? Math.round((seg.kcal.min + seg.kcal.max) / 2) : null;
+  })();
+  tile(
+    root,
+    "Intake, last 7 days",
+    d.avgKcal7d === null ? "—" : fmtInt(d.avgKcal7d),
+    d.avgKcal7d === null ? "" : "kcal",
+    d.avgKcal7d !== null && envMid !== null
+      ? (d.avgKcal7d >= envMid ? "+" : "−") +
+          fmtInt(Math.abs(d.avgKcal7d - envMid)) +
+          " vs plan midpoint"
+      : "daily average when logged"
+  );
+  tile(
+    root,
+    "Protein",
+    d.proteinPerKgAvg === null ? "—" : String(d.proteinPerKgAvg),
+    d.proteinPerKgAvg === null ? "" : "g/kg",
+    `reference ${PROTEIN_PER_KG_REF} g/kg/day`
+  );
+}
+
+function drawGridAndTicks(svg, geo, ticks) {
+  for (const t of ticks) {
+    el(
+      "line",
+      {
+        x1: geo.M.left,
+        x2: geo.M.left + geo.plotW,
+        y1: geo.y(t),
+        y2: geo.y(t),
+        stroke: t === 0 ? "var(--axis)" : "var(--grid)",
+        "stroke-width": 1,
+      },
+      svg
+    );
+    if (t > 0) {
+      const lbl = el(
+        "text",
+        { x: geo.M.left - 6, y: geo.y(t) + 3, "text-anchor": "end" },
+        svg
+      );
+      lbl.textContent = fmtInt(t);
+    }
+  }
+}
+
+function drawEnvelopeBand(svg, geo, days, bandKind) {
+  for (const seg of DATA.envelopes) {
+    const i0 = days.findIndex((d) => d.date === seg.from);
+    const i1 = days.findIndex((d) => d.date === seg.to);
+    if (i0 < 0 || i1 < 0) {
+      continue;
+    }
+    el(
+      "rect",
+      {
+        x: geo.x(i0),
+        width: geo.x(i1) + geo.bandW - geo.x(i0),
+        y: geo.y(seg[bandKind].max),
+        height: Math.max(
+          0,
+          geo.y(seg[bandKind].min) - geo.y(seg[bandKind].max)
+        ),
+        fill: "var(--series-wash)",
+      },
+      svg
+    );
+  }
+}
+
+function drawDateLabels(svg, geo, days, centered) {
+  const labelEvery = Math.max(1, Math.ceil(days.length / 8));
+  for (const [i, d] of days.entries()) {
+    if (i % labelEvery === 0) {
+      const lbl = el(
+        "text",
+        {
+          x: geo.x(i) + (centered ? geo.bandW / 2 : 0),
+          y: geo.M.top + geo.plotH + 16,
+          "text-anchor": "middle",
+        },
+        svg
+      );
+      lbl.textContent = shortDate(d.date);
+    }
+  }
+}
+
+function drawWhisker(svg, geo, cx, v, u) {
+  if (u <= 1) {
+    return;
+  }
+  el(
+    "line",
+    {
+      x1: cx,
+      x2: cx,
+      y1: geo.y(Math.max(0, v - u)),
+      y2: geo.y(v + u),
+      stroke: "var(--muted)",
+      "stroke-width": 2,
+      "stroke-linecap": "round",
+      opacity: 0.8,
+      "pointer-events": "none",
+    },
+    svg
+  );
+}
+
+function drawWorkoutDot(svg, geo, cx, d) {
+  const dot = el(
+    "circle",
+    {
+      cx,
+      cy: geo.M.top + geo.plotH + 26,
+      r: 4,
+      fill: "var(--workout)",
+      stroke: "var(--surface)",
+      "stroke-width": 2,
+      tabindex: 0,
+      role: "img",
+      "aria-label": `${shortDate(d.date)}: workout ${d.workoutMin} min`,
+    },
+    svg
+  );
+  bindTooltip(dot, () => [
+    [shortDate(d.date), ""],
+    ["min workout", String(d.workoutMin)],
+  ]);
+}
+
+function drawRefLines(svg, geo, refLines) {
+  for (const ref of refLines) {
+    if (ref.value === null || ref.value === undefined) {
+      continue;
+    }
+    el(
+      "line",
+      {
+        x1: geo.M.left,
+        x2: geo.M.left + geo.plotW,
+        y1: geo.y(ref.value),
+        y2: geo.y(ref.value),
+        stroke: "var(--ink-2)",
+        "stroke-width": 1.5,
+        "stroke-dasharray": "5 4",
+      },
+      svg
+    );
+    const lbl = el(
+      "text",
+      {
+        x: geo.M.left + geo.plotW + 5,
+        y: geo.y(ref.value) + 3,
+        class: "refline-label",
+      },
+      svg
+    );
+    lbl.textContent = ref.label;
+  }
+}
+
+function barChart(config) {
+  const {
+    mount,
+    days,
+    valueOf: dayValue,
+    bandKind,
+    refLines,
+    whiskers,
+    workoutRow,
+  } = config;
+  const logged = days.filter((d) => d.logged);
+  if (logged.length === 0) {
+    if (config.key) {
+      config.key.remove();
+    }
+    html("p", "empty", mount).textContent = "No days logged in this window.";
+    return;
+  }
+  const W = 680;
+  const M = { top: 14, right: 58, bottom: workoutRow ? 34 : 24, left: 40 };
+  const plotW = W - M.left - M.right;
+  const bandVals = DATA.envelopes.flatMap((s) =>
+    bandKind ? [s[bandKind].max] : []
+  );
+  const maxVal = Math.max(
+    ...logged.map((d) => dayValue(d) + (whiskers ? uncertaintyKcal(d) : 0)),
+    ...bandVals,
+    ...refLines.map((r) => r.value || 0)
+  );
+  const ticks = niceTicks(maxVal * 1.06, 4);
+  const yMax = ticks.at(-1);
+  const plotH = 190;
+  const H = plotH + M.top + M.bottom;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img" }, null);
+  const geo = {
+    M,
+    plotW,
+    plotH,
+    bandW: plotW / days.length,
+    x: (i) => M.left + (i * plotW) / days.length,
+    y: (v) => M.top + plotH - (v / yMax) * plotH,
+  };
+
+  drawGridAndTicks(svg, geo, ticks);
+  if (bandKind) {
+    drawEnvelopeBand(svg, geo, days, bandKind);
+  }
+  drawDateLabels(svg, geo, days, true);
+
+  const barW = Math.min(24, Math.max(2, geo.bandW - 2));
+  for (const [i, d] of days.entries()) {
+    if (!d.logged) {
+      continue;
+    }
+    const v = dayValue(d);
+    const bx = geo.x(i) + (geo.bandW - barW) / 2;
+    const bar = el(
+      "path",
+      {
+        d: roundedTopBar(bx, geo.y(v), barW, geo.y(0) - geo.y(v), 4),
+        class: "bar",
+        tabindex: 0,
+        role: "img",
+        "aria-label": `${shortDate(d.date)}: ${fmtInt(v)} ${config.unit}`,
+      },
+      svg
+    );
+    bindTooltip(bar, () => config.tooltipRows(d));
+    if (whiskers) {
+      drawWhisker(svg, geo, bx + barW / 2, v, uncertaintyKcal(d));
+    }
+    if (workoutRow && d.workoutMin > 0) {
+      drawWorkoutDot(svg, geo, geo.x(i) + geo.bandW / 2, d);
+    }
+  }
+
+  drawRefLines(svg, geo, refLines);
+  mount.appendChild(svg);
+}
+
+function renderKcalChart() {
+  const key = document.getElementById("kcalKey");
+  keyEntry(key, "swatch", null, "diet-chart envelope");
+  keySep(key);
+  keyEntry(key, "", null, "dashed = est. expenditure");
+  keySep(key);
+  keyEntry(key, "dot", "var(--workout)", "workout day");
+  keySep(key);
+  keyEntry(key, "", null, "whisker = estimate uncertainty");
+  barChart({
+    mount: document.getElementById("kcalChart"),
+    key,
+    days: DATA.days,
+    unit: "kcal",
+    valueOf: (d) => d.totals.kcal,
+    bandKind: "kcal",
+    whiskers: true,
+    workoutRow: true,
+    refLines: [{ value: DATA.derived.tdee, label: "est. TDEE" }],
+    tooltipRows: (d) => {
+      const rows = [
+        [shortDate(d.date), ""],
+        ["kcal", fmtInt(d.totals.kcal)],
+        ["g protein", fmt1(d.totals.protein)],
+      ];
+      const env = envelopeAt(d.date, "kcal");
+      if (env) {
+        rows.push([`plan ${fmtInt(env.min)}–${fmtInt(env.max)}`, ""]);
+      }
+      if (d.cheats > 0) {
+        rows.push([`cheat: ${d.cheatSlots.join(", ")}`, ""]);
+      }
+      return rows;
+    },
+  });
+}
+
+function renderProteinChart() {
+  const key = document.getElementById("proteinKey");
+  keyEntry(key, "swatch", null, "diet-chart protein band");
+  const refKg = referenceKg();
+  if (refKg) {
+    keySep(key);
+    keyEntry(key, "", null, `dashed = ${PROTEIN_PER_KG_REF} g/kg reference`);
+  }
+  barChart({
+    mount: document.getElementById("proteinChart"),
+    key,
+    days: DATA.days,
+    unit: "g protein",
+    valueOf: (d) => d.totals.protein,
+    bandKind: "protein",
+    whiskers: false,
+    workoutRow: false,
+    refLines: [
+      refKg
+        ? {
+            value: Math.round(refKg * PROTEIN_PER_KG_REF),
+            label: `${PROTEIN_PER_KG_REF} g/kg`,
+          }
+        : { value: null, label: "" },
+    ],
+    tooltipRows: (d) => {
+      const rows = [
+        [shortDate(d.date), ""],
+        ["g protein", fmt1(d.totals.protein)],
+      ];
+      const env = envelopeAt(d.date, "protein");
+      if (env) {
+        rows.push([`plan ${fmtInt(env.min)}–${fmtInt(env.max)} g`, ""]);
+      }
+      return rows;
+    },
+  });
+}
+
+function renderWeightChart() {
+  const mount = document.getElementById("weightChart");
+  const key = document.getElementById("weightKey");
+  const weighIns = DATA.days.filter((d) => d.weightKg !== null);
+  const trend = DATA.derived.weightTrend;
+  if (weighIns.length === 0) {
+    html("p", "empty", mount).textContent = "No weigh-ins in this window.";
+    key.remove();
+    return;
+  }
+  keyEntry(key, "dot", "var(--muted)", "weigh-in");
+  keySep(key);
+  keyEntry(key, "dot", "var(--series)", "smoothed trend");
+  const treatments = DATA.days.filter((d) => d.treatment !== null);
+  if (treatments.length > 0) {
+    keySep(key);
+    keyEntry(key, "swatch", "var(--treatment-wash)", "treatment session");
+  }
+
+  const W = 680;
+  const M = { top: 14, right: 58, bottom: 24, left: 44 };
+  const plotW = W - M.left - M.right;
+  const plotH = 170;
+  const H = plotH + M.top + M.bottom;
+  const kgs = weighIns.map((d) => d.weightKg).concat(trend.map((t) => t.kg));
+  const lo = Math.floor(Math.min(...kgs) * 2) / 2 - 0.5;
+  const hi = Math.ceil(Math.max(...kgs) * 2) / 2 + 0.5;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img" }, null);
+  const days = DATA.days;
+  const x = (i) => M.left + ((i + 0.5) * plotW) / days.length;
+  const y = (kg) => M.top + plotH - ((kg - lo) / (hi - lo)) * plotH;
+  const idx = new Map(days.map((d, i) => [d.date, i]));
+
+  const step = (hi - lo) / 4;
+  for (let t = 0; t <= 4; t++) {
+    const kg = lo + t * step;
+    el(
+      "line",
+      {
+        x1: M.left,
+        x2: M.left + plotW,
+        y1: y(kg),
+        y2: y(kg),
+        stroke: t === 0 ? "var(--axis)" : "var(--grid)",
+        "stroke-width": 1,
+      },
+      svg
+    );
+    const lbl = el(
+      "text",
+      { x: M.left - 6, y: y(kg) + 3, "text-anchor": "end" },
+      svg
+    );
+    lbl.textContent = fmt1(kg);
+  }
+  const labelEvery = Math.max(1, Math.ceil(days.length / 8));
+  for (const [i, d] of days.entries()) {
+    if (i % labelEvery === 0) {
+      const lbl = el(
+        "text",
+        {
+          x: x(i),
+          y: M.top + plotH + 16,
+          "text-anchor": "middle",
+        },
+        svg
+      );
+      lbl.textContent = shortDate(d.date);
+    }
+  }
+
+  for (const d of treatments) {
+    const i = idx.get(d.date);
+    el(
+      "rect",
+      {
+        x: x(i) - plotW / days.length / 2,
+        width: plotW / days.length,
+        y: M.top,
+        height: plotH,
+        fill: "var(--treatment-wash)",
+      },
+      svg
+    );
+  }
+
+  if (trend.length > 1) {
+    const path = trend
+      .map((t, i) => `${(i === 0 ? "M" : "L") + x(idx.get(t.date))},${y(t.kg)}`)
+      .join("");
+    el(
+      "path",
+      {
+        d: path,
+        fill: "none",
+        stroke: "var(--series)",
+        "stroke-width": 2,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round",
+      },
+      svg
+    );
+  }
+  for (const d of weighIns) {
+    el(
+      "circle",
+      {
+        cx: x(idx.get(d.date)),
+        cy: y(d.weightKg),
+        r: 3.5,
+        fill: "var(--muted)",
+        stroke: "var(--surface)",
+        "stroke-width": 2,
+      },
+      svg
+    );
+  }
+  const lastT = trend.at(-1);
+  if (lastT) {
+    el(
+      "circle",
+      {
+        cx: x(idx.get(lastT.date)),
+        cy: y(lastT.kg),
+        r: 4.5,
+        fill: "var(--series)",
+        stroke: "var(--surface)",
+        "stroke-width": 2,
+      },
+      svg
+    );
+    const lbl = el(
+      "text",
+      {
+        x: M.left + plotW + 5,
+        y: y(lastT.kg) + 3,
+        class: "refline-label",
+      },
+      svg
+    );
+    lbl.textContent = `${fmt1(lastT.kg)} kg`;
+  }
+
+  const crosshair = el(
+    "line",
+    {
+      y1: M.top,
+      y2: M.top + plotH,
+      stroke: "var(--axis)",
+      "stroke-width": 1,
+      visibility: "hidden",
+      "pointer-events": "none",
+    },
+    svg
+  );
+  const overlay = el(
+    "rect",
+    {
+      x: M.left,
+      y: M.top,
+      width: plotW,
+      height: plotH,
+      fill: "transparent",
+    },
+    svg
+  );
+  const trendByDate = new Map(trend.map((t) => [t.date, t.kg]));
+  overlay.addEventListener("pointermove", (e) => {
+    const rect = svg.getBoundingClientRect();
+    const px = ((e.clientX - rect.left) / rect.width) * W;
+    const i = Math.max(
+      0,
+      Math.min(
+        days.length - 1,
+        Math.floor(((px - M.left) / plotW) * days.length)
+      )
+    );
+    const d = days[i];
+    crosshair.setAttribute("x1", x(i));
+    crosshair.setAttribute("x2", x(i));
+    crosshair.setAttribute("visibility", "visible");
+    const rows = [[shortDate(d.date), ""]];
+    if (d.weightKg !== null) {
+      rows.push(["kg weighed", fmt1(d.weightKg)]);
+    }
+    if (trendByDate.has(d.date)) {
+      rows.push(["kg trend", fmt1(trendByDate.get(d.date))]);
+    }
+    if (d.treatment !== null) {
+      rows.push([d.treatment, ""]);
+    }
+    if (rows.length === 1) {
+      rows.push(["no weigh-in", ""]);
+    }
+    showTooltip(rows, e.clientX, e.clientY);
+  });
+  overlay.addEventListener("pointerleave", () => {
+    crosshair.setAttribute("visibility", "hidden");
+    hideTooltip();
+  });
+
+  mount.appendChild(svg);
+}
+
+function renderHeatmap() {
+  const key = document.getElementById("heatKey");
+  keyEntry(key, "swatch", "var(--heat-2)", "darker = more meals logged");
+  keySep(key);
+  keyEntry(key, "dot", "var(--cheat)", "cheat meal");
+  const root = document.getElementById("heatmap");
+  const labels = html("div", "heat-daylabels", root);
+  for (const t of ["Mon", "", "Wed", "", "Fri", "", "Sun"]) {
+    html("span", "", labels).textContent = t;
+  }
+  const grid = html("div", "heatgrid", root);
+  const lead = weekdayIndexMon(DATA.days[0].date);
+  for (let i = 0; i < lead; i++) {
+    html("span", "cell blank", grid);
+  }
+  const heatVar = (meals) =>
+    meals >= 4 ? "var(--heat-4)" : `var(--heat-${meals})`;
+  for (const d of DATA.days) {
+    const cell = html("span", "cell", grid);
+    cell.tabIndex = 0;
+    cell.setAttribute("role", "img");
+    if (d.logged) {
+      cell.classList.add("logged");
+      cell.style.background = heatVar(d.meals);
+    }
+    if (d.cheats > 0) {
+      cell.classList.add("cheat");
+    }
+    cell.setAttribute(
+      "aria-label",
+      shortDate(d.date) +
+        ": " +
+        (d.logged
+          ? `${d.meals} meals, ${fmtInt(d.totals.kcal)} kcal`
+          : "not logged") +
+        (d.cheats > 0 ? `, ${d.cheats} cheat` : "")
+    );
+    bindTooltip(cell, () => {
+      const rows = [[shortDate(d.date), ""]];
+      if (d.logged) {
+        rows.push(["meals", String(d.meals)]);
+        rows.push(["kcal", fmtInt(d.totals.kcal)]);
+      } else {
+        rows.push(["not logged", ""]);
+      }
+      if (d.cheats > 0) {
+        rows.push([`cheat: ${d.cheatSlots.join(", ")}`, ""]);
+      }
+      return rows;
+    });
+  }
+  const c = DATA.derived.consistency;
+  document.getElementById("streakline").textContent =
+    c.daysLogged +
+    " of " +
+    c.totalDays +
+    " days logged (" +
+    c.pctLogged +
+    "%)" +
+    " · current streak " +
+    c.currentStreak +
+    " · longest " +
+    c.longestStreak;
+}
+
+function renderInsights() {
+  const root = document.getElementById("insights");
+  const items = Array.isArray(INSIGHTS) ? INSIGHTS : [];
+  if (items.length === 0) {
+    document.getElementById("insightsCard").remove();
+    return;
+  }
+  for (const text of items) {
+    html("li", "", root).textContent = text;
+  }
+}
+
+function renderTable() {
+  const box = document.getElementById("tablebox");
+  const table = html("table", "", box);
+  const thead = html("thead", "", table);
+  const hr = html("tr", "", thead);
+  for (const h of [
+    "Date",
+    "kcal",
+    "Protein g",
+    "Weight kg",
+    "Meals",
+    "Cheats",
+    "Workout min",
+  ]) {
+    html("th", "", hr).textContent = h;
+  }
+  const tbody = html("tbody", "", table);
+  for (const d of DATA.days) {
+    const tr = html("tr", "", tbody);
+    html("td", "", tr).textContent = shortDate(d.date);
+    html("td", "", tr).textContent = d.logged ? fmtInt(d.totals.kcal) : "—";
+    html("td", "", tr).textContent = d.logged ? fmt1(d.totals.protein) : "—";
+    html("td", "", tr).textContent =
+      d.weightKg === null ? "—" : fmt1(d.weightKg);
+    html("td", "", tr).textContent = d.logged ? String(d.meals) : "—";
+    html("td", "", tr).textContent = d.cheats > 0 ? String(d.cheats) : "";
+    html("td", "", tr).textContent =
+      d.workoutMin > 0 ? String(d.workoutMin) : "";
+  }
+}
+
+renderWindowLabel();
+renderTiles();
+renderKcalChart();
+renderWeightChart();
+renderProteinChart();
+renderHeatmap();
+renderInsights();
+renderTable();
+</script>

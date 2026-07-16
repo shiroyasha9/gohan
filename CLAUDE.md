@@ -8,7 +8,7 @@ This repo is the dev workspace and its own plugin marketplace. User data never l
 
 - `packages/core` holds zod schemas and pure logic. `packages/core/src/schemas.ts` is the authoritative shape of every data file.
 - `apps/scripts` holds the CLI sources (validate, summary, recompute, import-indb). They resolve `data/` relative to cwd, i.e. the user's data repo.
-- `plugin/` is the shipped surface: `skills/` (all 8), `scripts/` (prebuilt bun bundles, generated, never hand-edit), `schemas.ts` (copy), `hooks/` (guarded SessionStart conventions).
+- `plugin/` is the shipped surface: `skills/` (all 9), `scripts/` (prebuilt bun bundles, generated, never hand-edit), `schemas.ts` (copy), `hooks/` (guarded SessionStart conventions).
 - `.claude-plugin/marketplace.json`: the repo doubles as its own marketplace, `source: ./plugin`.
 
 ## Working on the plugin

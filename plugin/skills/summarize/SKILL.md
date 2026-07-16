@@ -1,6 +1,6 @@
 ---
 name: summarize
-description: Report intake totals and trends. Use for "summary", "how am I doing", "how was this week", or preparing numbers for a dietician/nutritionist.
+description: Report intake totals and trends as numbers in chat. Use for "summary", "how am I doing", "how was this week", or preparing numbers for a dietician/nutritionist. For a visual chart artifact instead, use dashboard.
 ---
 
 Read-only: no writes, no commit.
